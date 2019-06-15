@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5 import QtCore
 import pyqtgraph as pg
 import numpy as np
+import struct
 
 PY3 = True
 if sys.version_info.major == 2:
@@ -46,29 +47,10 @@ class BasePlot(object):
         self.close_stream()
         self.app.exit()
 
-    def readline(self):
-        global PY3
-        if PY3:
-            return self.stream.readline().decode('utf8', errors='ignore').rstrip()
-        else:
-            return self.stream.readline().rstrip()
-
     def read_data(self):
-        line = self.readline();
-        self.nLines += 1
-        print(line, end='|')
-        if self.nLines % 5 == 0:
-            print()
-        fs = line.split(',')
-        try:
-            fs = [float(x.strip()) for x in fs]
-        except Exception:
-            print( f"[WARN ] Could not convert: {line}" )
-            fs = []
-        return fs
-                
-
-
+        a, b = self.stream.read(), self.stream.read()
+        #  print('x', a, b)
+        return [ord(a), ord(b)]
 
 
     def plot_init(self):
@@ -76,7 +58,7 @@ class BasePlot(object):
             trial_data = self.read_data()
 
         # First value is time. Always.
-        for i in range(len(trial_data)-1):
+        for i in range(len(trial_data)):
             new_plot = self.layout.addPlot()
             new_plot.plot(np.zeros(250))
             self.plot_list.append(new_plot.listDataItems()[0])
@@ -86,12 +68,11 @@ class BasePlot(object):
         stream_data = self.read_data()
         if not stream_data:
             return
-        for data, line in zip(stream_data[1:], self.plot_list):
+        for data, line in zip(stream_data, self.plot_list):
             line.informViewBoundsChanged()
-            line.xData = np.roll(line.xData, -1)
+            line.xData = np.arange(0, len(line.yData))
             line.yData = np.roll(line.yData, -1)
             line.yData[-1] = data
-            line.xData[-1] = stream_data[0]
             line.xClean = line.yClean = None
             line.xDisp = None
             line.yDisp = None

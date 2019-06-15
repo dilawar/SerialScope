@@ -56,13 +56,14 @@ bool is_command_read( char command, bool consume = true )
     return false;
 }
 
-void check_for_reset( void )
+char channel_1()
 {
-    if( is_command_read('r', true ) )
-    {
-        Serial.println( ">>> Received r. Reboot in 2 seconds" );
-        reboot_ = true;
-    }
+    return random(0, 255);
+}
+
+char channel_2()
+{
+    return random(0, 255);
 }
 
 
@@ -73,10 +74,8 @@ void check_for_reset( void )
  */
 void write_data_line( )
 {
-    char msg[100];
-    sprintf(msg, "%lu,%d", millis(), random(0, 256));
-    Serial.println(msg);
-    delay( 3 );
+    Serial.print(channel_1());
+    Serial.print(channel_2());
 }
 
 void setup()
