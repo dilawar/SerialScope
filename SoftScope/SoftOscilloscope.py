@@ -10,6 +10,7 @@ PY3 = True
 if sys.version_info.major == 2:
     PY3 = False
 
+lines_ = []
 
 class BasePlot(object):
     def __init__(self, stream, **kwargs):
@@ -27,6 +28,7 @@ class BasePlot(object):
         self.view.setWindowTitle('Software Oscilloscope')
         self.view.resize(800,600)
         self.plot_list = []
+        self.nLines = 0
 
     def open_stream(self):
         print("Opening Stream")
@@ -51,22 +53,45 @@ class BasePlot(object):
         else:
             return self.stream.readline().rstrip()
 
+    def read_data(self):
+        line = self.readline();
+        self.nLines += 1
+        print(line, end='|')
+        if self.nLines % 5 == 0:
+            print()
+        fs = line.split(',')
+        try:
+            fs = [float(x.strip()) for x in fs]
+        except Exception:
+            print( f"[WARN ] Could not convert: {line}" )
+            fs = []
+        return fs
+                
+
+
+
+
     def plot_init(self):
         for i in range(20):
-            trial_data = self.readline().split(',')
-        for i in range(len(trial_data)):
+            trial_data = self.read_data()
+
+        # First value is time. Always.
+        for i in range(len(trial_data)-1):
             new_plot = self.layout.addPlot()
             new_plot.plot(np.zeros(250))
             self.plot_list.append(new_plot.listDataItems()[0])
             self.layout.nextRow()
         
     def update(self):
-        stream_data = self.readline().split(',')
-        for data, line in zip(stream_data, self.plot_list):
+        stream_data = self.read_data()
+        if not stream_data:
+            return
+        for data, line in zip(stream_data[1:], self.plot_list):
             line.informViewBoundsChanged()
-            line.xData = np.arange(len(line.yData))
+            line.xData = np.roll(line.xData, -1)
             line.yData = np.roll(line.yData, -1)
             line.yData[-1] = data
+            line.xData[-1] = stream_data[0]
             line.xClean = line.yClean = None
             line.xDisp = None
             line.yDisp = None
