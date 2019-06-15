@@ -1,2 +1,1 @@
-# NeuroScope
-Oscilloscope for Neuroscience course/CAMP @NCBS Bangalore
+python3 based GUI client for moose server.
