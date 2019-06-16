@@ -23,9 +23,13 @@ H = config.h_
 # Two graphs. One for channel 1 and other for channel 2.
 graphChannel = [
         [sg.Graph(canvas_size=(W*2//3, H//2), graph_bottom_left=(0,-255),
-            graph_top_right=(1000, 255), background_color='white', key='channelA')],
+            graph_top_right=(100, 255), background_color='black', key='channelA'
+            #  , enable_events = True
+            )],
         [sg.Graph(canvas_size=(W*2//3, H//2), graph_bottom_left=(0,0),
-            graph_top_right=(1000, 255), background_color='white', key='channelB')],
+            graph_top_right=(100, 255), background_color='black', key='channelB'
+            #  , enable_events = True
+            )],
         ]
 
 currentTab = sg.Tab('Live', graphChannel)
@@ -71,24 +75,19 @@ def draw_canvas(canvas, imgs):
 
 def update_channel_window(data):
     global chAGraph_, chBGraph_
-    y = random.randint(0, 100) * 1.0
-    #  chAGraph_.Erase()
     for (t0, a0, b0), (t1, a1, b1) in zip(data, data[1:]):
-        print(y, end = ' ')
-        x = chAGraph_.DrawLine((1.0,1.0), (10.0,y), color='red')
-        assert x
-        print( chAGraph_.Size, chAGraph_.Visible )
-        #  print( f"Drawing {(t0, a0)} to {(t1, a1)}" )
-        #  chAGraph_.DrawLine( (int(t0*1000), a0), (int(t1*1000), a1), color='black')
-        #  chBGraph_.DrawLine( (t0, b0), (t1, b1), color='black')
-    #  chAGraph_.update()
-    #  chBGraph_.update()
+        chAGraph_.DrawLine( (t0, a0), (t1, a1), color='white')
+        chBGraph_.DrawLine( (t0, b0), (t1, b1), color='white')
+    chAGraph_._TKCanvas2.update()
+    chBGraph_._TKCanvas2.update()
 
 def main():
     global mainWindow
+    # Test is broken
     while True:
         data = [(1,1,1), (1,2,2), (1,3,2)]
         update_channel_window(data)
+        time.sleep(0.1)
 
 if __name__ == '__main__':
     main()

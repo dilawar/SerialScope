@@ -8,14 +8,28 @@ __maintainer__       = "Dilawar Singh"
 __email__            = "dilawars@ncbs.res.in"
 __status__           = "Development"
 
-import client
+import arduino
 import time
 import helper
 import layout
 import multiprocessing as mp
+import threading
 
 class Args: pass 
 args = Args()
+
+def draw_window(q, window):
+    data = []
+    while True:
+        while not q.empty():
+            data.append(q.get())
+        if len(data) <= 10:
+            continue
+        layout.update_channel_window(data)
+        data = []
+
+# I can not update window in other thread because XCB will create trouble.
+
 
 def main():
     global args
@@ -23,10 +37,16 @@ def main():
     # Launch arduino reader.
     arduinoQ = mp.Queue()
     clientDone = mp.Value('d', 0)
-    arduinoClient = client.SerialReader(args.serial, args.baudrate)
+    arduinoClient = arduino.SerialReader(args.port, args.baudrate)
     arduinoP = mp.Process(target=arduinoClient.run, args=(arduinoQ, clientDone))
     arduinoP.daemon = True
     arduinoP.start()
+
+    # This can not be a multiprocessing Process since XinitThreads. Use it in
+    # main process with timeout.
+    windowP = threading.Thread(target=draw_window, args=(arduinoQ, layout.mainWindow))
+    windowP.daemon = True
+    windowP.start()
 
     while True:
         event, values = window.Read()
@@ -46,7 +66,7 @@ if __name__ == '__main__':
     # Argument parser.
     description = '''Arduino NeuroScope.'''
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--serial', '-s', type=str
+    parser.add_argument('--port', '-p', type=str
             , default = '/dev/ttyACM0'
             , required = False, help = 'Input file'
             )

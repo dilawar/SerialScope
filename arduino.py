@@ -23,14 +23,14 @@ class SerialReader():
         self.s = serial.Serial(port, baud)
         self.done = False
 
-    #  @classmethod
     def run(self, q, done):
-        # Keep runing and put data in q
+        # Keep runing and put data in q. 
         print( f"[INFO ] STARTING acquiring data from Arduino." )
+        t0 = time.time()
         while True:
             a, b = self.s.read(), self.s.read()
-            t = time.time()
-            q.put((t, a, b))
+            t = time.time() - t0
+            q.put((t, ord(a), ord(b)))
             if done.value == 1:
                 print( '[INFO] STOPPING acquiring data.' )
                 break
