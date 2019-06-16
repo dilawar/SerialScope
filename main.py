@@ -28,7 +28,7 @@ def draw_window(q, window):
             if data[-1][0] - data[0][0] >= sampleT:
                 # keep collecting till we have sampleT worth of samples.
                 break
-        logger.debug(f"Total points {len(data)}")
+        #  logger.debug(f"Total points {len(data)}")
         layout.update_channel_window(data)
         data = []
 
