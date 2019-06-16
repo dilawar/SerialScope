@@ -11,6 +11,7 @@ __status__           = "Development"
 import serial
 import time
 import multiprocessing as mp 
+from config import logger
 
 all_done_ = False
 
@@ -25,14 +26,14 @@ class SerialReader():
 
     def run(self, q, done):
         # Keep runing and put data in q. 
-        print( f"[INFO ] STARTING acquiring data from Arduino." )
+        logger.info( f"Acquiring data from Arduino." )
         t0 = time.time()
         while True:
             a, b = self.s.read(), self.s.read()
             t = time.time() - t0
             q.put((t, ord(a), ord(b)))
             if done.value == 1:
-                print( '[INFO] STOPPING acquiring data.' )
+                logger.info( 'STOP acquiring data.' )
                 break
         self.done = True
         self.close()
@@ -40,7 +41,7 @@ class SerialReader():
         return True
 
     def close(self):
-        print( f"[INFO ] Calling close." )
+        logger.info( f"Calling close." )
         self.s.close()
 
 def test():

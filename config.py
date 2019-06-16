@@ -11,17 +11,9 @@ __status__           = "Development"
 
 import logging
 logging.basicConfig(level=logging.DEBUG,
-    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-    datefmt='%m-%d %H:%M',
-    filename='moose-client.log',
-    filemode='a'
+    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
     )
-console = logging.StreamHandler()
-console.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
-console.setFormatter(formatter)
-logger = logging.getLogger('moose.client')
-logger.addHandler(console)
+logger = logging.getLogger('scope')
 
 # set resolution.
 w_, h_ = 1200, 900

@@ -11,20 +11,24 @@ __status__           = "Development"
 import arduino
 import time
 import helper
-import layout
+import layout 
 import multiprocessing as mp
 import threading
+from config import logger
 
 class Args: pass 
 args = Args()
 
 def draw_window(q, window):
-    data = []
+    # data should contain at least 1ms of data.
+    sampleT, data = 10e-3, []
     while True:
         while not q.empty():
             data.append(q.get())
-        if len(data) <= 10:
-            continue
+            if data[-1][0] - data[0][0] >= sampleT:
+                # keep collecting till we have sampleT worth of samples.
+                break
+        logger.debug(f"Total points {len(data)}")
         layout.update_channel_window(data)
         data = []
 
@@ -58,7 +62,7 @@ def main():
         else:
             helper.log( 'Unsupported event' )
     window.Close()
-    print( f"[INFO ] ALL DONE. Window is closed." )
+    logger.info( f"ALL DONE. Window is closed." )
     
 
 if __name__ == '__main__':
