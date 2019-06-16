@@ -8,6 +8,8 @@
 #include <avr/wdt.h>
 
 #define NUM_CHANNELS  2
+#define DATA_LENGTH   1
+#define DOUBLE_LENGTH 8
 
 /*-----------------------------------------------------------------------------
  *  User response
@@ -15,8 +17,8 @@
 int incoming_byte_              = 0;
 bool reboot_                    = false;
 char subcommand_[NUM_CHANNELS];
-double params_[NUM_CHANNELS][5];
-char data_[NUM_CHANNELS][40];
+char data_[NUM_CHANNELS][DATA_LENGTH*8];
+double params_[NUM_CHANNELS][DATA_LENGTH];
 
 ISR(WDT_vect)
 {
@@ -37,6 +39,30 @@ void reset_watchdog( )
 }
 
 
+void print_debug_data()
+{
+    Serial.println("== DATA ");
+    for (size_t i = 0; i < NUM_CHANNELS; i++) 
+    {
+        Serial.println(subcommand_[i]);
+        for (size_t ii = 0; ii < DATA_LENGTH; ii++) 
+        {
+            Serial.print(params_[i][ii]);
+            Serial.print(',');
+        }
+        Serial.println("");
+    }
+}
+
+inline void wait_for_data()
+{
+    while( ! Serial.available() )
+    {
+        reset_watchdog();
+        continue;
+    }
+}
+
 /**
  * @brief  Command send to arduino starts with character 'c'. Immediate after a
  * character code is send which is subcommand. It is again 1 byte long. 
@@ -44,29 +70,45 @@ void reset_watchdog( )
  * as parameters for subcommands.
  * TODO: more information.
  */
-bool is_command_read( bool consume = true )
+bool is_command_read( )
 {
     if( ! Serial.available() )
         return false;
 
-    // Peek for the first character.
-    if( 'c' == Serial.peek( ) )
+    if( 'c' == Serial.read( ) )
     {
-        if( consume )
-            Serial.read( );
-
+        Serial.println( "Got command " );
         // Command has started.
-        int whichChannel = Serial.read();
+        wait_for_data();
+        int whichChannel = Serial.read() % 2;
+        Serial.println( "Channel " + String(whichChannel));
+
+        wait_for_data();
         subcommand_[whichChannel] = Serial.read();
-        for (size_t i = 0; i < 40; i++) 
+        Serial.println( "Subcommand " + String(subcommand_[whichChannel]) );
+        Serial.println( " Waiting for data. " + String(DATA_LENGTH*8));
+        for (size_t i = 0; i < DATA_LENGTH*8; i++) 
+        {
+            wait_for_data();
             data_[whichChannel][i] = Serial.read();
+            Serial.print( data_[whichChannel][i] );
+        }
 
         // Its 8 bytes.
-        for (size_t i = 0; i < 5; i++) 
-            memcpy(&params_[whichChannel][i], data_+(whichChannel*5+i*8), 8);
+        Serial.println( "\tConverting to double" );
+        for (size_t i = 0; i < DATA_LENGTH; i++) 
+        {
+            memcpy(params_+whichChannel*DATA_LENGTH+i
+                    , data_+(whichChannel*DATA_LENGTH*DOUBLE_LENGTH)+(i*DOUBLE_LENGTH)
+                    , DOUBLE_LENGTH
+                    );
+        }
+
+        print_debug_data();
     }
     return false;
 }
+
 
 char channel_1()
 {
@@ -102,7 +144,6 @@ void setup()
     // rougly x/10 char per seconds or x/1000 char per 10 ms. We want rougly 100
     // chars per ms i.e. baud rate should be higher than 100,000.
     Serial.begin( 115200 );
-
     //esetup watchdog. If not reset in 2 seconds, it reboots the system.
     wdt_enable( WDTO_2S );
     wdt_reset();
@@ -111,5 +152,6 @@ void setup()
 void loop()
 {
     reset_watchdog();
-    write_data_line();
+    is_command_read();
+    // write_data_line();
 }

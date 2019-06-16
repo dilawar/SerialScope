@@ -64,4 +64,4 @@ LOCAL_CPP_SRCS     =
 include $(ARDMK_DIR)/Arduino.mk
 
 run : upload
-	miniterm /dev/ttyACM0 $(MONITOR_BAUDRATE)
+	miniterm $(MONITOR_PORT) $(MONITOR_BAUDRATE)
