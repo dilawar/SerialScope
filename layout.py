@@ -56,18 +56,16 @@ column1 = [
     [sg.Spin(values=('Spin Box 1', '2', '3'), initial_value='Spin Box 3')]
 ]
 
-sigGen = sg.Frame('Signal Generator', [[
-    sg.Slider(range=(1, 100),
-              orientation='v',
-              size=(5, 20),
-              default_value=25,
-              tick_interval=25),
-    sg.Slider(range=(1, 100), orientation='v', size=(5, 20), default_value=75),
-    sg.Slider(range=(1, 100), orientation='v', size=(5, 20), default_value=10),
-    #  sg.Column(column1, background_color='lightblue')
-]])
+sigGen = sg.Frame('Signal Generator'
+        , [
+            [ sg.Radio("Random", "SignalGenFunc"), sg.Radio("Step", "SignalGenFunc")],
+            [sg.Slider(range=(1,100), orientation='v', size=(5, 20), default_value=25),
+            sg.Slider(range=(1, 100), orientation='v', size=(5, 20), default_value=75),
+            sg.Slider(range=(1, 100), orientation='v', size=(5, 20), default_value=10)]
+         ]
+        )
 
-oscWidgets = sg.Frame('Labelled Group', [[
+oscWidgets = sg.Frame('Functions', [[
     sg.Slider(range=(1, 100),
               orientation='v',
               size=(5, 20),
