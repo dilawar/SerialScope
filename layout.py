@@ -56,7 +56,7 @@ column1 = [
     [sg.Spin(values=('Spin Box 1', '2', '3'), initial_value='Spin Box 3')]
 ]
 
-widgets = sg.Frame('Labelled Group', [[
+sigGen = sg.Frame('Signal Generator', [[
     sg.Slider(range=(1, 100),
               orientation='v',
               size=(5, 20),
@@ -64,11 +64,26 @@ widgets = sg.Frame('Labelled Group', [[
               tick_interval=25),
     sg.Slider(range=(1, 100), orientation='v', size=(5, 20), default_value=75),
     sg.Slider(range=(1, 100), orientation='v', size=(5, 20), default_value=10),
-    sg.Column(column1, background_color='lightblue')
+    #  sg.Column(column1, background_color='lightblue')
 ]])
 
-layout = [[sg.TabGroup([[currentTab, artifactTab]]), widgets],
-          [sg.Submit('Launch'), sg.Exit('Quit')]]
+oscWidgets = sg.Frame('Labelled Group', [[
+    sg.Slider(range=(1, 100),
+              orientation='v',
+              size=(5, 20),
+              default_value=25,
+              tick_interval=25),
+    sg.Slider(range=(1, 100), orientation='v', size=(5, 20), default_value=75),
+    sg.Slider(range=(1, 100), orientation='v', size=(5, 20), default_value=10),
+    #  sg.Column(column1, background_color='lightblue')
+]])
+
+widgets = sg.Column([[sigGen], [oscWidgets]])
+
+layout = [
+        [sg.TabGroup([[currentTab, artifactTab]]), widgets]
+        , [sg.Submit('Launch'), sg.Exit('Quit')]
+        ]
 
 # We want it global. Otherwise garbage collected will destroy the images.
 images_ = {}
