@@ -11,14 +11,14 @@ __status__ = "Development"
 
 import PySimpleGUI as sg
 import time
-
 import config
-from config import logger
+import guihelper as GH
 
 W = config.w_
 H = config.h_
+
 maxX = config.T_
-maxY = 260
+maxY = 300
 nFrames = 0
 
 # Two graphs. One for channel 1 and other for channel 2.
@@ -89,35 +89,15 @@ mainWindow = sg.Window('NeuroScope').Layout(layout).Finalize()
 
 chAGraph_ = mainWindow.FindElement("channelA")
 chBGraph_ = mainWindow.FindElement("channelB")
-
-def update_channel_window(data):
-    global chAGraph_, chBGraph_
-    global maxX
-    global nFrames
-    for (t0, a0, b0), (t1, a1, b1) in zip(data, data[1:]):
-        # as soon as t1 cross maxX, we clear the plot
-        if t1 >= nFrames * maxX:
-            nFrames += 1
-            chAGraph_.Erase()
-            chBGraph_.Erase()
-            logger.info( 'Cleaning Channels.' )
-            break
-
-        t0, t1 = t0%maxX, t1%maxX
-        chAGraph_.DrawLine((t0, a0), (t1, a1), color='white')
-        chBGraph_.DrawLine((t0, b0), (t1, b1), color='white')
-
-    # hack.
-    chAGraph_._TKCanvas2.update()
-    chBGraph_._TKCanvas2.update()
-
+GH.draw_axis(chAGraph_)
+GH.draw_axis(chBGraph_)
 
 def main():
     global mainWindow
     # Test is broken
     while True:
         data = [(1, 1, 1), (1, 2, 2), (1, 3, 2)]
-        update_channel_window(data)
+        GH.update_channel_window(data)
         time.sleep(0.1)
 
 if __name__ == '__main__':

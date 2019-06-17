@@ -15,6 +15,7 @@ import layout
 import multiprocessing as mp
 import threading
 import config
+import guihelper as GH
 from config import logger
 
 class Args: pass 
@@ -30,7 +31,7 @@ def draw_window(q, window):
                 # keep collecting till we have sampleT worth of samples.
                 break
         #  logger.debug(f"Total points {len(data)}")
-        layout.update_channel_window(data)
+        GH.update_channel_window(data)
         data = []
 
 # I can not update window in other thread because XCB will create trouble.
