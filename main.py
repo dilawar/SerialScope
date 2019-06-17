@@ -48,6 +48,16 @@ def main():
             clientDone = True
             time.sleep(0.1)
             break  
+        if event.lower() == 'toggle_run':
+            e = window.FindElement("toggle_run")
+            if e.GetText() == "START":
+                # start the recording again.
+                e.Update(text="STOP")
+                GH.freeze_ = False
+            else:
+                # stop the recording.
+                e.Update(text="START")
+                GH.freeze_ = True
         else:
             logger.warn( 'Unsupported event' )
     window.Close()

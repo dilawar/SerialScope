@@ -9,6 +9,9 @@ import layout as L
 import config as C
 import numpy as np
 
+# Freeze everything.
+freeze_ = False
+
 gridMajorX_, gridMajorY_ = 15, 20
 nFrames = 0
 nData = 0
@@ -58,10 +61,18 @@ def draw_channel_b(t0, b0, t1, b1):
 def update_channel_window(t1, a1, b1):
     global nData
     global ch1Lines, ch2Lines
+    global freeze_
     global t0, a0, b0
     nData += 1
     t1 = t1 % L.maxX 
     if t0 >= t1:
+        # This is obvious. But when freeze_ is set True by a key-press, we wait
+        # till maximum time for which we can plot in the screen is passed. Then
+        # we freeze. Note that moving this logic to end of this block will
+        # defeat the purpose. If you doubt me; just move the following two lines
+        # around.
+        if freeze_:
+            return
         for l in ch1Lines:
             L.graph_.TKCanvas.delete(l)
         ch1Lines = []

@@ -69,8 +69,11 @@ widgets = sg.Column([[], [oscWidgets]])
 
 layout = [
         [sg.TabGroup([[currentTab, artifactTab]]), widgets]
-        , [sg.Submit('Bored?', key='bored'), sg.Exit('Quit', key='quit')]
-        ]
+        , [
+            sg.Submit('Bored?', key='bored')
+            , sg.Submit('STOP', key='toggle_run')
+            , sg.Exit('Quit', key='quit')
+        ]]
 
 # We want it global. Otherwise garbage collected will destroy the images.
 images_ = {}
