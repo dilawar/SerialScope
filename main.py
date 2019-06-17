@@ -10,7 +10,6 @@ __status__           = "Development"
 
 import arduino
 import time
-import helper
 import layout 
 import multiprocessing as mp
 import threading
@@ -31,7 +30,8 @@ def main():
     arduinoQ = mp.Queue()
     clientDone = mp.Value('d', 0)
     arduinoClient = arduino.SerialReader(args.port, args.baudrate)
-    arduinoP = mp.Process(target=arduinoClient.run, args=(arduinoQ, clientDone))
+    #  arduinoP = mp.Process(target=arduinoClient.run, args=(arduinoQ, clientDone))
+    arduinoP = mp.Process(target=arduinoClient.run_without_arduino, args=(arduinoQ, clientDone))
     arduinoP.daemon = True
     arduinoP.start()
 
@@ -44,12 +44,12 @@ def main():
     while True:
         event, values = window.Read()
         print(event, values)
-        if event is None or event == 'Quit':  
+        if event is None or event.lower() == 'quit':  
             clientDone = True
             time.sleep(0.1)
             break  
         else:
-            helper.log( 'Unsupported event' )
+            logger.warn( 'Unsupported event' )
     window.Close()
     logger.info( f"ALL DONE. Window is closed." )
     

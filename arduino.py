@@ -11,6 +11,7 @@ __status__           = "Development"
 import serial
 import time
 import multiprocessing as mp 
+import random
 from config import logger
 
 all_done_ = False
@@ -21,12 +22,36 @@ class SerialReader():
         self.s = None
         self.port = port
         self.baud = baud
-        self.s = serial.Serial(port, baud)
+        self.s = None
+        try:
+            self.s = serial.Serial(port, baud)
+        except Exception:
+            pass
         self.done = False
+
+    def run_without_arduino(self, q, done):
+        t0 = time.time()
+        while True:
+            a, b = random.randint(0, 256), random.randint(0, 256)
+            t = time.time() - t0
+            q.put((t, a, b))
+            time.sleep(0.0005)
+            if done.value == 1:
+                logger.info( 'STOP acquiring data.' )
+                break
+        self.done = True
+        self.close()
+        q.close()
+        return True
+
 
     def run(self, q, done):
         # Keep runing and put data in q. 
         logger.info( f"Acquiring data from Arduino." )
+        if not self.s:
+            logger.warning( "Arduino is not connected.")
+            return 
+
         t0 = time.time()
         while True:
             a, b = self.s.read(), self.s.read()

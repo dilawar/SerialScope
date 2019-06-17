@@ -18,28 +18,17 @@ W = config.w_
 H = config.h_
 
 maxX = config.T_
-maxY = 300
+maxY = config.Y_
 nFrames = 0
 
 # Two graphs. One for channel 1 and other for channel 2.
-graphChannel = [
-    [
-        sg.Graph(canvas_size=(W*2//3, H//2),
-                 graph_bottom_left=(0, -maxY),
-                 graph_top_right=(maxX, maxY),
-                 background_color='black',
-                 key='channelA')
-    ],
-    [
-        sg.Graph(canvas_size=(W*2//3, H//2),
-                 graph_bottom_left=(0, -maxY),
-                 graph_top_right=(maxX, maxY),
-                 background_color='black',
-                 key='channelB')
-    ],
-]
+graph = sg.Graph(canvas_size=(W*2//3, 2*H//3),
+            graph_bottom_left=(0, -maxY),
+            graph_top_right=(maxX, maxY),
+            background_color='black',
+            key='graph')
 
-currentTab = sg.Tab('Live', graphChannel)
+currentTab = sg.Tab('Live', [[graph]])
 artifactTab = sg.Tab( 'Data', []
         , [[sg.Canvas(size=(config.w_*2//3,config.h_), key='data')]]
         )
@@ -76,21 +65,19 @@ oscWidgets = sg.Frame('Functions', [[
     #  sg.Column(column1, background_color='lightblue')
 ]])
 
-widgets = sg.Column([[sigGen], [oscWidgets]])
+widgets = sg.Column([[], [oscWidgets]])
 
 layout = [
         [sg.TabGroup([[currentTab, artifactTab]]), widgets]
-        , [sg.Submit('Launch'), sg.Exit('Quit')]
+        , [sg.Submit('Bored?', key='bored'), sg.Exit('Quit', key='quit')]
         ]
 
 # We want it global. Otherwise garbage collected will destroy the images.
 images_ = {}
 mainWindow = sg.Window('NeuroScope').Layout(layout).Finalize()
 
-chAGraph_ = mainWindow.FindElement("channelA")
-chBGraph_ = mainWindow.FindElement("channelB")
-GH.draw_axis(chAGraph_)
-GH.draw_axis(chBGraph_)
+graph_ = mainWindow.FindElement("graph")
+GH.draw_axis(graph_)
 
 def main():
     global mainWindow

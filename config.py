@@ -30,3 +30,6 @@ def log(msg, level=1):
 
 # max time on x-axis
 T_ = 0.2
+
+# y-axis goes from -Y_ to Y_
+Y_ = 550
