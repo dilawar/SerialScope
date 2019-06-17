@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+
+__author__           = "Dilawar Singh"
+__copyright__        = "Copyright 2019-, Dilawar Singh"
+__maintainer__       = "Dilawar Singh"
+__email__            = "dilawars@ncbs.res.in"
+
 import layout as L
 import config as C
 import numpy as np
@@ -6,7 +13,7 @@ gridMajorX_, gridMajorY_ = 15, 20
 nFrames = 0
 
 def draw_axis( graph ):
-    lineColor = 'gray'
+    lineColor = 'gray13'
     for x in np.linspace(0, L.maxX, gridMajorY_):
         graph.DrawLine( (x, -L.maxY), (x, L.maxY), color=lineColor)
 

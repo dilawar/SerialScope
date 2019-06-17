@@ -29,5 +29,5 @@ def log(msg, level=1):
     logger.log(level, msg)
 
 # max time on x-axis
-T_ = 1
+T_ = 0.2
 
