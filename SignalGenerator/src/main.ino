@@ -51,15 +51,12 @@ void reset_watchdog( )
 
 char channel(char cmd)
 {
-    size_t TIME_PERIOD = 1000; // In uS
+    size_t TIME_PERIOD = 10000; // In uS
 
-    if(cmd == 'r')
-        return random(0, 255);
-
-    else if(cmd == 's')
+    if(cmd == 's')
     {
         size_t dt = micros() - t_;
-        if( dt  < (TIME_PERIOD/2) )
+        if( dt  <= (TIME_PERIOD/2) )
             return 0;
         else
         {
@@ -68,6 +65,8 @@ char channel(char cmd)
             return 255;
         }
     }
+    if(cmd == 'r')
+        return random(0, 255);
     else
         return random(0, 100);
 }

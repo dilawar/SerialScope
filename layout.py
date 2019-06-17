@@ -96,10 +96,10 @@ def update_channel_window(data):
     global nFrames
     for (t0, a0, b0), (t1, a1, b1) in zip(data, data[1:]):
         # as soon as t1 cross maxX, we clear the plot
-        if t1 >= nFrames * 10*maxX:
+        if t1 >= nFrames * maxX:
             nFrames += 1
-            #  chAGraph_.Erase()
-            #  chBGraph_.Erase()
+            chAGraph_.Erase()
+            chBGraph_.Erase()
             logger.info( 'Cleaning Channels.' )
             break
 

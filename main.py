@@ -22,7 +22,7 @@ args = Args()
 
 def draw_window(q, window):
     # data should contain at least 1ms of data.
-    sampleT, data = 10*config.T_, []
+    sampleT, data = config.T_, []
     while True:
         while not q.empty():
             data.append(q.get())
