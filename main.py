@@ -14,28 +14,15 @@ import helper
 import layout 
 import multiprocessing as mp
 import threading
-import config
 import guihelper as GH
 from config import logger
 
 class Args: pass 
 args = Args()
 
-def draw_window(q, window):
-    # data should contain at least 1ms of data.
-    sampleT, data = config.T_, []
+def collect_data(q):
     while True:
-        while not q.empty():
-            data.append(q.get())
-            if data[-1][0] - data[0][0] >= sampleT:
-                # keep collecting till we have sampleT worth of samples.
-                break
-        #  logger.debug(f"Total points {len(data)}")
-        GH.update_channel_window(data)
-        data = []
-
-# I can not update window in other thread because XCB will create trouble.
-
+        GH.update_channel_window(*q.get())
 
 def main():
     global args
@@ -50,7 +37,7 @@ def main():
 
     # This can not be a multiprocessing Process since XinitThreads. Use it in
     # main process with timeout.
-    windowP = threading.Thread(target=draw_window, args=(arduinoQ, layout.mainWindow))
+    windowP = threading.Thread(target=collect_data, args=(arduinoQ,))
     windowP.daemon = True
     windowP.start()
 
