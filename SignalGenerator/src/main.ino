@@ -11,14 +11,25 @@
 #define DATA_LENGTH   1
 #define DOUBLE_LENGTH 8
 
+#ifdef TESTING 
+#define PRINT(a) Serial.print(a);
+#define PRINTLN(a) Serial.println(a);
+#else
+#define PRINT(a) ;
+#define PRINTLN(a) ;
+#endif
+
+
 /*-----------------------------------------------------------------------------
  *  User response
  *-----------------------------------------------------------------------------*/
 int incoming_byte_              = 0;
 bool reboot_                    = false;
-char subcommand_[NUM_CHANNELS];
+char subcommand_[NUM_CHANNELS] = { 's', 's' };
 char data_[NUM_CHANNELS][DATA_LENGTH*8];
 double params_[NUM_CHANNELS][DATA_LENGTH];
+
+size_t t_ = 0;
 
 ISR(WDT_vect)
 {
@@ -38,20 +49,45 @@ void reset_watchdog( )
         wdt_reset( );
 }
 
+char channel(char cmd)
+{
+    size_t TIME_PERIOD = 1000; // In uS
+
+    if(cmd == 'r')
+        return random(0, 255);
+
+    else if(cmd == 's')
+    {
+        size_t dt = micros() - t_;
+        if( dt  < (TIME_PERIOD/2) )
+            return 0;
+        else
+        {
+            if( dt >= TIME_PERIOD)
+                t_ = micros();
+            return 255;
+        }
+    }
+    else
+        return random(0, 100);
+}
+
 
 void print_debug_data()
 {
+#ifdef TESTING
     Serial.println("== DATA ");
     for (size_t i = 0; i < NUM_CHANNELS; i++) 
     {
         Serial.println(subcommand_[i]);
         for (size_t ii = 0; ii < DATA_LENGTH; ii++) 
         {
-            Serial.print(params_[i][ii]);
-            Serial.print(',');
+            PRINT(params_[i][ii]);
+            PRINT(',');
         }
-        Serial.println("");
+        PRINTLN("");
     }
+#endif
 }
 
 inline void wait_for_data()
@@ -77,25 +113,25 @@ bool is_command_read( )
 
     if( 'c' == Serial.read( ) )
     {
-        Serial.println( "Got command " );
+        PRINTLN( "Got command " );
         // Command has started.
         wait_for_data();
         int whichChannel = Serial.read() % 2;
-        Serial.println( "Channel " + String(whichChannel));
+        PRINTLN( "Channel " + String(whichChannel));
 
         wait_for_data();
         subcommand_[whichChannel] = Serial.read();
-        Serial.println( "Subcommand " + String(subcommand_[whichChannel]) );
-        Serial.println( " Waiting for data. " + String(DATA_LENGTH*8));
+        PRINTLN( "Subcommand " + String(subcommand_[whichChannel]) );
+        PRINTLN( " Waiting for data. " + String(DATA_LENGTH*8));
         for (size_t i = 0; i < DATA_LENGTH*8; i++) 
         {
             wait_for_data();
             data_[whichChannel][i] = Serial.read();
-            Serial.print( data_[whichChannel][i] );
+            PRINT( data_[whichChannel][i] );
         }
 
         // Its 8 bytes.
-        Serial.println( "\tConverting to double" );
+        PRINTLN( "\tConverting to double" );
         for (size_t i = 0; i < DATA_LENGTH; i++) 
         {
             memcpy(params_+whichChannel*DATA_LENGTH+i
@@ -112,18 +148,12 @@ bool is_command_read( )
 
 char channel_1()
 {
-    if( subcommand_[0] == 'r')
-        return random(0, 255);
-    else
-        return random(0, 10);
+    return channel(subcommand_[0]);
 }
 
 char channel_2()
 {
-    if( subcommand_[1] == 'r')
-        return random(0, 255);
-    else
-        return random(0, 10);
+    return channel(subcommand_[1]);
 }
 
 
@@ -147,11 +177,13 @@ void setup()
     //esetup watchdog. If not reset in 2 seconds, it reboots the system.
     wdt_enable( WDTO_2S );
     wdt_reset();
+
+    t_ = millis();
 }
 
 void loop()
 {
     reset_watchdog();
     is_command_read();
-    // write_data_line();
+    write_data_line();
 }

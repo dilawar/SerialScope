@@ -14,6 +14,7 @@ import helper
 import layout 
 import multiprocessing as mp
 import threading
+import config
 from config import logger
 
 class Args: pass 
@@ -21,7 +22,7 @@ args = Args()
 
 def draw_window(q, window):
     # data should contain at least 1ms of data.
-    sampleT, data = 10e-3, []
+    sampleT, data = 10*config.T_, []
     while True:
         while not q.empty():
             data.append(q.get())

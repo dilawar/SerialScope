@@ -17,8 +17,8 @@ from config import logger
 
 W = config.w_
 H = config.h_
-maxX = 1
-maxY = 255
+maxX = config.T_
+maxY = 260
 nFrames = 0
 
 # Two graphs. One for channel 1 and other for channel 2.
@@ -96,10 +96,10 @@ def update_channel_window(data):
     global nFrames
     for (t0, a0, b0), (t1, a1, b1) in zip(data, data[1:]):
         # as soon as t1 cross maxX, we clear the plot
-        if t1 >= nFrames * maxX:
+        if t1 >= nFrames * 10*maxX:
             nFrames += 1
-            chAGraph_.Erase()
-            chBGraph_.Erase()
+            #  chAGraph_.Erase()
+            #  chBGraph_.Erase()
             logger.info( 'Cleaning Channels.' )
             break
 
