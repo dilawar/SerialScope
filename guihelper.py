@@ -29,24 +29,30 @@ offsetB_ = C.Y_ // 2
 
 def draw_axis(graph):
     lineColor = 'gray13'
-    for x in np.linspace(0, L.maxX, gridMajorY_):
+    graph.Erase()
+
+    xspace = np.linspace(0, L.maxX, gridMajorY_)
+    for x in xspace:
         graph.DrawLine( (x, -L.maxY), (x, L.maxY), color=lineColor)
+    dx = 1000*(xspace[1] - xspace[0])
 
-    for y in np.linspace(-L.maxY, L.maxY, gridMajorX_):
+
+    chASpace = np.linspace(-L.maxY, L.maxY, gridMajorX_)
+    for y in chASpace:
         graph.DrawLine( (0, y), (L.maxX, y), color=lineColor)
+    dy = chASpace[1] - chASpace[0]
 
-    graph.DrawLine( (0, offsetA_), (L.maxX, offsetA_), color=colorA_, width=0.1)
-    graph.DrawText( 'Channel A', (C.T_*0.95, offsetA_-5), color=colorA_, angle=0)
+    graph.DrawText( f"x-axis: {dx:.3f} ms | channel: {dy:.3f}", (C.T_*0.5, -L.maxY * 0.95), color='white')
 
-    graph.DrawLine( (0, offsetB_), (L.maxX, offsetB_), color=colorB_, width=0.1)
-    graph.DrawText( 'Channel B', (C.T_*0.95, offsetB_-5), color=colorB_, angle=0)
+    # Draw label on x-axis.
+    ax0, ax1 = C.T_*0.01, C.T_
+    graph.DrawLine( (ax0, offsetA_), (ax1, offsetA_), color=colorA_, width=0.1)
+    graph.DrawText( 'A', (ax0, offsetA_), color=colorA_, angle=0)
 
+    bx0, bx1 = 0, C.T_*0.99
+    graph.DrawLine( (bx0, offsetB_), (bx1, offsetB_), color=colorB_, width=0.1)
+    graph.DrawText( 'B', (bx1, offsetB_), color=colorB_, angle=0)
 
-def reinit_graphs():
-    L.chAGraph_.Erase()
-    L.chBGraph_.Erase()
-    draw_axis(L.chAGraph_)
-    draw_axis(L.chBGraph_)
 
 def draw_channel_a(t0, a0, t1, a1):
     global ch1Lines
