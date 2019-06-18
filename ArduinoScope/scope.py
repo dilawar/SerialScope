@@ -12,17 +12,16 @@ import threading
 
 from ArduinoScope import arduino
 from ArduinoScope import layout 
-from ArduinoScope import window 
-from ArduinoScope.window import ScopeGUI
+from ArduinoScope import gui 
 from ArduinoScope.config import logger
 
 
-class Scope(ScopeGUI):
+class Scope(gui.ScopeGUI):
     """
     Main class for Scope.
     """
     def __init__(self, window):
-        ScopeGUI.__init__(self, window)
+        gui.ScopeGUI.__init__(self, window)
         self.done = False
 
     def handleEvents(self):
@@ -44,7 +43,7 @@ class Scope(ScopeGUI):
         elif event.lower() == "xaxis-resolution":
             e = self.window.FindElement("xaxis-resolution")
             v = values['xaxis-resolution']
-            window.updateXAxisResolution(v)
+            self.updateXAxisResolution(v)
         else:
             logger.info( f"Event: {event} and {values}")
             logger.warn( 'Unsupported event' )

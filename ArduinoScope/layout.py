@@ -11,7 +11,6 @@ import time
 import PySimpleGUI as sg
 
 from ArduinoScope import config
-from ArduinoScope import window 
 
 W = config.w_
 H = config.h_
@@ -34,8 +33,8 @@ artifactTab = sg.Tab( 'Data', []
 
 # Time axis widgets.
 xWidgets = sg.Frame('X-axis', [
-    [ sg.Slider(range=(2, 100, 2),
-        orientation='h', size=(20, 10), default_value=10,
+    [ sg.Slider(range=(0, 100, 10),
+        orientation='h', size=(20, 15), default_value=10,
         enable_events=True,
         tick_interval=10,
         key="xaxis-resolution"
@@ -72,14 +71,3 @@ layout = [
 # We want it global. Otherwise garbage collected will destroy the images.
 images_ = {}
 mainWindow = sg.Window('Arduino Scope').Layout(layout).Finalize()
-
-def main():
-    global mainWindow
-    # Test is broken
-    while True:
-        data = [(1, 1, 1), (1, 2, 2), (1, 3, 2)]
-        window.update_channel_window(data)
-        time.sleep(0.1)
-
-if __name__ == '__main__':
-    main()
