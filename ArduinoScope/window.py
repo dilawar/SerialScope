@@ -43,6 +43,14 @@ xAsisResoultion_ = 1.0
 # scaling factor.
 scaleX_, scaleA_, scaleB_ = 1.0, 1.0, 1.0
 
+class ScopeGuiWindow():
+    """
+    Helper class for Scope GUI.
+    """
+    def __init__(self, window):
+        self.window = window
+
+
 def attach_label(graph, dx, dy):
     global gElems
     if 'label' in gElems:

@@ -11,7 +11,7 @@ import time
 import PySimpleGUI as sg
 
 from ArduinoScope import config
-from ArduinoScope import guihelper as GH
+from ArduinoScope import window 
 
 W = config.w_
 H = config.h_
@@ -74,14 +74,14 @@ images_ = {}
 mainWindow = sg.Window('Arduino Scope').Layout(layout).Finalize()
 
 graph_ = mainWindow.FindElement("graph")
-GH.draw_axis(graph_)
+window.draw_axis(graph_)
 
 def main():
     global mainWindow
     # Test is broken
     while True:
         data = [(1, 1, 1), (1, 2, 2), (1, 3, 2)]
-        GH.update_channel_window(data)
+        window.update_channel_window(data)
         time.sleep(0.1)
 
 if __name__ == '__main__':

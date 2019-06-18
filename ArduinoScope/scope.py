@@ -13,15 +13,56 @@ import time
 
 from ArduinoScope import arduino
 from ArduinoScope import layout 
-from ArduinoScope import guihelper as GH
+from ArduinoScope import window 
 from ArduinoScope.config import logger
 
 def collect_data(q):
     while True:
-        GH.update_channel_window(*q.get())
+        window.update_channel_window(*q.get())
+
+
+class Scope():
+    """
+    Main class for Scope.
+    """
+    def __init__(self, window):
+        self.window = window
+        assert self.window
+        self.done = False
+
+    def handleEvents(self):
+        event, values = self.window.Read()
+        if event is None or event.lower() == 'quit':  
+            self.done = True
+            return
+
+        if event.lower() == 'toggle_run':
+            e = self.window.FindElement("toggle_run")
+            if e.GetText() == "START":
+                # start the recording again.
+                e.Update(text="PAUSE")
+                window.freeze_ = False
+            else:
+                # stop the recording.
+                e.Update(text="START")
+                window.freeze_ = True
+        elif event.lower() == "xaxis-resolution":
+            e = self.window.FindElement("xaxis-resolution")
+            v = values['xaxis-resolution']
+            window.updateXAxisResolution(v)
+        else:
+            logger.info( f"Event: {event} and {values}")
+            logger.warn( 'Unsupported event' )
+
+    def run(self):
+        while True:
+            self.handleEvents()
+            if self.done:
+                break
+        self.window.close()
+
 
 def main(args):
-    window = layout.mainWindow 
     # Launch arduino reader.
     arduinoQ = mp.Queue()
     clientDone = mp.Value('d', 0)
@@ -37,28 +78,6 @@ def main(args):
     windowP.daemon = True
     windowP.start()
 
-    while True:
-        event, values = window.Read()
-        if event is None or event.lower() == 'quit':  
-            clientDone = True
-            time.sleep(0.1)
-            break  
-        if event.lower() == 'toggle_run':
-            e = window.FindElement("toggle_run")
-            if e.GetText() == "START":
-                # start the recording again.
-                e.Update(text="PAUSE")
-                GH.freeze_ = False
-            else:
-                # stop the recording.
-                e.Update(text="START")
-                GH.freeze_ = True
-        elif event.lower() == "xaxis-resolution":
-            e = window.FindElement("xaxis-resolution")
-            v = values['xaxis-resolution']
-            GH.updateXAxisResolution(v)
-        else:
-            logger.info( f"Event: {event} and {values}")
-            logger.warn( 'Unsupported event' )
-    window.Close()
+    scope = Scope(layout.mainWindow)
+    scope.run()
     logger.info( f"ALL DONE. Window is closed." )
