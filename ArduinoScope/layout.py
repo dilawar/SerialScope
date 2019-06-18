@@ -1,6 +1,4 @@
-"""layout.py: 
-
-"""
+# -*- coding: utf-8 -*-
 
 __author__ = "Dilawar Singh"
 __copyright__ = "Copyright 2017-, Dilawar Singh"
@@ -9,10 +7,11 @@ __maintainer__ = "Dilawar Singh"
 __email__ = "dilawars@ncbs.res.in"
 __status__ = "Development"
 
-import PySimpleGUI as sg
 import time
-import config
-import guihelper as GH
+import PySimpleGUI as sg
+
+from ArduinoScope import config
+from ArduinoScope import guihelper as GH
 
 W = config.w_
 H = config.h_

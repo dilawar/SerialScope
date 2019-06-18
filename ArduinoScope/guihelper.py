@@ -5,9 +5,9 @@ __copyright__        = "Copyright 2019-, Dilawar Singh"
 __maintainer__       = "Dilawar Singh"
 __email__            = "dilawars@ncbs.res.in"
 
-import layout as L
-import config as C
 import numpy as np
+from ArduinoScope import layout as L
+from ArduinoScope import config as C
 
 # Freeze everything.
 freeze_ = False

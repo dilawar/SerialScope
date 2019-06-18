@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function
     
 __author__           = "Dilawar Singh"
 __copyright__        = "Copyright 2017-, Dilawar Singh"
@@ -8,23 +7,20 @@ __maintainer__       = "Dilawar Singh"
 __email__            = "dilawars@ncbs.res.in"
 __status__           = "Development"
 
-import arduino
-import time
-import layout 
 import multiprocessing as mp
 import threading
-import guihelper as GH
-from config import logger
+import time
 
-class Args: pass 
-args = Args()
+from ArduinoScope import arduino
+from ArduinoScope import layout 
+from ArduinoScope import guihelper as GH
+from ArduinoScope.config import logger
 
 def collect_data(q):
     while True:
         GH.update_channel_window(*q.get())
 
-def main():
-    global args
+def main(args):
     window = layout.mainWindow 
     # Launch arduino reader.
     arduinoQ = mp.Queue()
@@ -62,20 +58,3 @@ def main():
             logger.warn( 'Unsupported event' )
     window.Close()
     logger.info( f"ALL DONE. Window is closed." )
-    
-
-if __name__ == '__main__':
-    import argparse
-    # Argument parser.
-    description = '''Arduino NeuroScope.'''
-    parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--port', '-p', type=str
-            , default = '/dev/ttyACM0'
-            , required = False, help = 'Input file'
-            )
-    parser.add_argument('--baudrate', '-B'
-            , required = False, default = 115200
-            , help = 'Baudrate of Arduino board.'
-            )
-    parser.parse_args(namespace=args)
-    main()

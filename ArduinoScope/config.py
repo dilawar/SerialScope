@@ -1,7 +1,5 @@
-"""config.py: 
-Configuration.
-"""
-    
+# -*- coding: utf-8 -*-
+
 __author__           = "Dilawar Singh"
 __copyright__        = "Copyright 2017-, Dilawar Singh"
 __version__          = "1.0.0"

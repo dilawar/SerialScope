@@ -12,7 +12,7 @@ import serial
 import time
 import multiprocessing as mp 
 import random
-from config import logger
+from ArduinoScope.config import logger
 
 all_done_ = False
 
