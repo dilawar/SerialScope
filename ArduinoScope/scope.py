@@ -36,11 +36,11 @@ class Scope(ScopeGUI):
             if e.GetText() == "START":
                 # start the recording again.
                 e.Update(text="PAUSE")
-                window.freeze_ = False
+                self.freeze()
             else:
                 # stop the recording.
                 e.Update(text="START")
-                window.freeze_ = True
+                self.unFreeze()
         elif event.lower() == "xaxis-resolution":
             e = self.window.FindElement("xaxis-resolution")
             v = values['xaxis-resolution']

@@ -29,7 +29,7 @@ class Channel():
         self.xStep = 10e-3
         self.axLine = None
         self.gridLines = []
-        self.gridColor = kwargs.get('grid_color', 'gray20')
+        self.gridColor = kwargs.get('grid_color', 'gray25')
 
     def canvas(self):
         return self.graph.TKCanvas
@@ -117,7 +117,7 @@ class ScopeGUI():
 
     def __init__(self, window):
         self.window = window
-        self.freeze = False
+        self.freezeChannels = False
         self.nFrame = 0
         self.nData = 0
         self.prev = 0.0, 0.0, 0.0
@@ -133,6 +133,21 @@ class ScopeGUI():
         self.topRight = (C.T_, 255)
         self.rect = (self.bottomLeft, self.topRight)
         self.init_channels()
+
+    def freeze(self, channel=None):
+        if channel is None:
+            for c in self.channels:
+                self.channels[c].freeze = True
+        else:
+            self.channels[channel].freeze = True
+
+    def unFreeze(self, channel=None):
+        if channel is None:
+            for c in self.channels:
+                self.channels[c].freeze = False
+        else:
+            self.channels[channel].freeze = False
+
 
     def init_channels(self):
         for c in self.channels:
