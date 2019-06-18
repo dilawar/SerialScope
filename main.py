@@ -52,7 +52,7 @@ def main():
             e = window.FindElement("toggle_run")
             if e.GetText() == "START":
                 # start the recording again.
-                e.Update(text="STOP")
+                e.Update(text="PAUSE")
                 GH.freeze_ = False
             else:
                 # stop the recording.

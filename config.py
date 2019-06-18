@@ -32,4 +32,8 @@ def log(msg, level=1):
 T_ = 0.2
 
 # y-axis goes from -Y_ to Y_
-Y_ = 550
+Y_ = 510
+
+# scale y-axis.
+YY_ = 255
+vMax_ = 5

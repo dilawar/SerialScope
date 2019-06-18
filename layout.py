@@ -71,7 +71,7 @@ layout = [
         [sg.TabGroup([[currentTab, artifactTab]]), widgets]
         , [
             sg.Submit('Bored?', key='bored')
-            , sg.Submit('STOP', key='toggle_run')
+            , sg.Submit('PAUSE', key='toggle_run')
             , sg.Exit('Quit', key='quit')
         ]]
 

@@ -51,6 +51,9 @@ void reset_watchdog( )
 
 char channel(char cmd)
 {
+    // analogRead is 10 bit. So we scale is to 8 bits before sending it. This is
+    // less accurate but we can send 4 times more data.
+
     size_t TIME_PERIOD = 10000; // In uS
 
     if(cmd == 's')
