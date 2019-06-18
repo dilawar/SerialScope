@@ -1,147 +1,162 @@
 # -*- coding: utf-8 -*-
 
-__author__           = "Dilawar Singh"
-__copyright__        = "Copyright 2019-, Dilawar Singh"
-__maintainer__       = "Dilawar Singh"
-__email__            = "dilawars@ncbs.res.in"
+__author__ = "Dilawar Singh"
+__copyright__ = "Copyright 2019-, Dilawar Singh"
+__maintainer__ = "Dilawar Singh"
+__email__ = "dilawars@ncbs.res.in"
 
 import numpy as np
-from ArduinoScope import layout as L
+from collections import defaultdict
 from ArduinoScope import config as C
 
-# Freeze everything.
-freeze_ = False
+logger = C.logger
 
-nFrames = 0
-nData = 0
 
-t0, a0, b0 = 0.0, 0.0, 0.0
+class Channel():
+    def __init__(self, graph, **kwargs):
+        self.graph = graph
+        self.xScale = 1.0
+        self.yScale = 1.0
+        self.lines = []
+        self.color = kwargs.get('color', 'white')
+        self.nData = 0
+        self.offset = kwargs.get('offset', 0.0)
+        self.freeze = False
+        self.prev = (0.0, 0.0)
+        self.curr = self.prev
+        self.xRange = (0, 0.2)
+        self.yRange = (0, 255)
+        self.xStep = 10e-3
+        self.axLine = None
+        self.gridLines = []
+        self.gridColor = kwargs.get('grid_color', 'gray20')
 
-# Graph lines
-ch1Lines, ch2Lines = [], []
-# Other elemenets
-gElems = {}
+    def canvas(self):
+        return self.graph.TKCanvas
 
-# channel properties
-colorA_ = 'cyan'
-colorB_ = 'yellow'
+    def draw_axis(self):
+        # Horizontal axis.
+        yLoc = self.offset
+        if self.axLine is not None:
+            self.canvas().delete(self.axLine)
+        self.axLine = self.graph.DrawLine((self.xRange[0], yLoc),
+                                          (self.xRange[1], yLoc),
+                                          color=self.color)
+        return self.axLine
 
-# offsets for channel 1 and 2.
-offsetA_ = C.rangeY_[0] + 1.0/C.getYResolution()
-offsetB_ = 1.0/C.getYResolution()
-C.logger.debug(f"Offset A {offsetA_} and offset B {offsetB_}") 
+    def draw_grid(self):
+        """
+        Draw grid on axis.
+        """
 
-# Grid size. Default values.
-# x-axis: 1 segment = 100 ms.
-# y-axis: 1 segement = 1v.
-NUMBER_OF_X_GRIDS = 20
-gridMajorX_, gridMajorY_ = C.rangeX_[1]/NUMBER_OF_X_GRIDS, 1.0/C.getYResolution()
+        # delete old grid if any.
+        for l in self.gridLines:
+            self.canvas().delete(l)
+        self.gridLines.clear()
 
-# resolution.
-xAsisResoultion_ = 1.0
+        # draw new grid.
+        xs = np.arange(self.xRange[0], self.xRange[1], self.xStep)
+        for x in xs:
+            gl = self.graph.DrawLine((x, self.offset + self.yRange[0]),
+                                     (x, self.offset + self.yRange[1]),
+                                     color=self.gridColor)
+            self.gridLines.append(gl)
 
-# scaling factor.
-scaleX_, scaleA_, scaleB_ = 1.0, 1.0, 1.0
+        # draw y grid. 1 section == 1 volt.
+        ys = np.arange(self.yRange[0], self.yRange[1], 255/5)
+        for y in ys:
+            gl = self.graph.DrawLine((self.xRange[0], self.offset+y),
+                    (self.xRange[1], self.offset+y),
+                    color=self.gridColor)
+            self.gridLines.append(gl)
 
-class ScopeGuiWindow():
+
+    def draw_value(self):
+        t1, y1 = self.curr
+        t0, y0 = self.prev
+        #  logger.debug(f"Drawing value {t1} {y1}")
+        l = self.graph.DrawLine(
+            (t0 * self.xScale, self.offset + (y0 * self.yScale)),
+            (t1 * self.xScale, self.offset + (y1 * self.yScale)),
+            color=self.color)
+        self.lines.append(l)
+
+    def add_value(self, t1, y1):
+        """
+        Add value to channel, draw it and update the canvas.
+        Make sure to delete old lines when we roll-over to next frame.
+        """
+        self.nData += 1
+        t0, y0 = self.prev
+        t1 = t1 % C.T_
+        self.curr = t1, y1
+        if t0 >= t1:
+            # This is NOT obvious. But when freeze is set True by a key-press, we wait
+            # till maximum time for which we can plot in the screen is passed. Then
+            # we freeze. Note that moving this logic to end of this block will
+            # defeat the purpose. If you doubt me; just move the following two lines
+            # around.
+            if self.freeze:
+                return
+            for l in self.lines:
+                self.canvas().delete(l)
+            self.lines.clear()
+            self.prev = (t1, y1)
+            return
+
+        self.draw_value()
+        self.prev = self.curr
+        if self.nData % 20 == 0:
+            self.canvas().update()
+
+
+class ScopeGUI():
     """
     Helper class for Scope GUI.
     """
+
     def __init__(self, window):
         self.window = window
+        self.freeze = False
+        self.nFrame = 0
+        self.nData = 0
+        self.prev = 0.0, 0.0, 0.0
+        self.curr = self.prev
+        self.elems = defaultdict(list)
+        self.colos = {'chanA.line': 'cyan', 'chanB.line': 'white'}
+        self.channels = dict(A=Channel(self.window.FindElement("graph"),
+                                       color="cyan", offset=-255),
+                             B=Channel(self.window.FindElement("graph"),
+                                       color="yellow", offset=51))
+        self.nGrids = dict(x=20, y=10)
+        self.bottomLeft = (0, -255)
+        self.topRight = (C.T_, 255)
+        self.rect = (self.bottomLeft, self.topRight)
+        self.init_channels()
 
+    def init_channels(self):
+        for c in self.channels:
+            ch = self.channels[c]
+            ax = ch.draw_axis()
+            self.elems['channel.axis'].append(ax)
+            grid = ch.draw_grid()
+            self.elems['channel.grid'].append(grid)
 
-def attach_label(graph, dx, dy):
-    global gElems
-    if 'label' in gElems:
-        graph.TKCanvas.delete(gElems['label'])
-    label = graph.DrawText( f"X: {dx:g} ms\tY: {dy:g}"
-            , (C.rangeX_[1]/2, C.rangeY_[0]*0.9)
-            , color='white')
-    gElems['label'] = label
+    def graph(self):
+        return self.window.FindElement("graph")
 
+    def canvas(self):
+        return self.graph().TkCanvas
 
-def draw_axis(graph):
-    global gElems
-    graph.Erase()
-    lineColor = 'gray20'
+    def attach_label(self):
+        if 'label' in self.elems:
+            self.graph.TKCanvas.delete(self.elems['label'])
 
-    # Draw x-grid (parallel to y-axis)
-    xspace = np.arange(C.rangeX_[0], C.rangeX_[1], gridMajorX_)
-    for x in xspace:
-        graph.DrawLine( (x, C.rangeY_[0]), (x, C.rangeY_[1]), color=lineColor)
-    dx = 1000*(xspace[1] - xspace[0])
+    def draw_axes(self):
+        self.graph.Erase()
+        for ch in self.channels:
+            self.channels[ch].draw_axis()
 
-    # Draw y-grid (parallel to x-axis)
-    yspace = np.arange(C.rangeY_[0], C.rangeY_[1], gridMajorY_)
-    for y in yspace:
-        graph.DrawLine( (C.rangeX_[0], y), (C.rangeX_[1], y), color=lineColor)
-    dy = (yspace[1] - yspace[0]) * C.getYResolution()
-
-    attach_label(graph, dx, dy)
-
-    # Draw label on x-axis.
-    ax0, ax1 = C.T_*0.01, C.T_
-    graph.DrawLine( (ax0, offsetA_), (ax1, offsetA_), color=colorA_, width=0.1)
-    graph.DrawText( 'A', (ax0, offsetA_), color=colorA_, angle=0)
-
-    bx0, bx1 = 0, C.T_*0.99
-    graph.DrawLine( (bx0, offsetB_), (bx1, offsetB_), color=colorB_, width=0.1)
-    graph.DrawText( 'B', (bx1, offsetB_), color=colorB_, angle=0)
-
-
-def draw_channel_a(t0, a0, t1, a1):
-    global ch1Lines
-    global scaleX_, scaleA_
-    l1 = L.graph_.DrawLine( (t0*scaleX_, offsetA_+(a0*scaleA_))
-            , (t1*scaleX_, offsetA_+(a1*scaleA_))
-            , color='cyan')
-    ch1Lines.append(l1)
-
-def draw_channel_b(t0, b0, t1, b1):
-    global ch2Lines
-    global scaleX_, scaleB_
-    l2 = L.graph_.DrawLine((t0*scaleX_, offsetB_+(b0*scaleB_))
-            , (t1*scaleX_, offsetB_+(b1*scaleB_))
-            , color='yellow')
-    ch2Lines.append(l2)
-
-def updateXAxisResolution(val):
-    # Update the x-axis resolution. After doing this, we need to redraw the axis
-    # as well.
-    global scaleX_
-    scaleX_ = val / 10.0
-    C.T_ = 0.2 / scaleX_
-    attach_label( L.graph_, C.T_/NUMBER_OF_X_GRIDS, 1.0/C.getYResolution())
-
-def update_channel_window(t1, a1, b1):
-    global nData
-    global ch1Lines, ch2Lines
-    global freeze_
-    global t0, a0, b0
-    nData += 1
-    t1 = t1 % C.T_ 
-    if t0 >= t1:
-        # This is obvious. But when freeze_ is set True by a key-press, we wait
-        # till maximum time for which we can plot in the screen is passed. Then
-        # we freeze. Note that moving this logic to end of this block will
-        # defeat the purpose. If you doubt me; just move the following two lines
-        # around.
-        if freeze_:
-            return
-        for l in ch1Lines:
-            L.graph_.TKCanvas.delete(l)
-        ch1Lines = []
-        for l in ch2Lines:
-            L.graph_.TKCanvas.delete(l)
-        ch2Lines = []
-
-        t0, a0, b0 = t1, a1, b1
-        return
-
-    draw_channel_a(t0, a0, t1, a1)
-    draw_channel_b(t0, b0, t1, b1)
-
-    t0, a0, b0 = t1, a1, b1
-    if nData % 100 == 0:
-        L.graph_.TKCanvas.update()
+    def add_values(self, t1, a1, b1):
+        self.channels["A"].add_value(t1, a1)
+        self.channels["B"].add_value(t1, b1)

@@ -73,9 +73,6 @@ layout = [
 images_ = {}
 mainWindow = sg.Window('Arduino Scope').Layout(layout).Finalize()
 
-graph_ = mainWindow.FindElement("graph")
-window.draw_axis(graph_)
-
 def main():
     global mainWindow
     # Test is broken

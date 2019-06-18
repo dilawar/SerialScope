@@ -9,25 +9,20 @@ __status__           = "Development"
 
 import multiprocessing as mp
 import threading
-import time
 
 from ArduinoScope import arduino
 from ArduinoScope import layout 
 from ArduinoScope import window 
+from ArduinoScope.window import ScopeGUI
 from ArduinoScope.config import logger
 
-def collect_data(q):
-    while True:
-        window.update_channel_window(*q.get())
 
-
-class Scope():
+class Scope(ScopeGUI):
     """
     Main class for Scope.
     """
     def __init__(self, window):
-        self.window = window
-        assert self.window
+        ScopeGUI.__init__(self, window)
         self.done = False
 
     def handleEvents(self):
@@ -59,8 +54,15 @@ class Scope():
             self.handleEvents()
             if self.done:
                 break
-        self.window.close()
+        self.window.Close()
 
+
+def collect_data(q, scope):
+    # A threaded function. Its job is to collect data from Queue which is being
+    # filled by Arduino client and send those values to ScopeGUI. May be we can
+    # let the ArduinoClient directly send values to ScopeGUI?
+    while True:
+        scope.add_values(*q.get())
 
 def main(args):
     # Launch arduino reader.
@@ -72,12 +74,14 @@ def main(args):
     arduinoP.daemon = True
     arduinoP.start()
 
+    # create a scope and share it with arduino client.
+    scope = Scope(layout.mainWindow)
+
     # This can not be a multiprocessing Process since XinitThreads. Use it in
     # main process with timeout.
-    windowP = threading.Thread(target=collect_data, args=(arduinoQ,))
-    windowP.daemon = True
-    windowP.start()
+    scopeP = threading.Thread(target=collect_data, args=(arduinoQ, scope))
+    scopeP.daemon = True
+    scopeP.start()
 
-    scope = Scope(layout.mainWindow)
     scope.run()
     logger.info( f"ALL DONE. Window is closed." )
