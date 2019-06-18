@@ -1,1 +1,1 @@
-python3 based GUI client for moose server.
+An oscilloscope based on Arduino Uno board (__Work in progress__)
