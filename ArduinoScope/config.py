@@ -26,12 +26,27 @@ except Exception as e:
 def log(msg, level=1):
     logger.log(level, msg)
 
-# max time on x-axis
-T_ = 0.2
+
+# Resolution: 0.0 to 5.0 Volts are divided into 255 segments. To keep the
+# data-tranfer to minimum, we read a byte from arduino. We convert this byte to
+# vol in oscilloscope.
+resolutions_ =  (5.0, 255)
+
+def getMaxY():
+    return resolutions_[1]
+
+def getMaxYValue():
+    # Get max values in volt.
+    return resolutions_[0]
+
+def getYResolution():
+    # volt per division.
+    return resolutions_[0]/resolutions_[1]
 
 # y-axis goes from -Y_ to Y_
-Y_ = 510
+Y = resolutions_[1] + 2.0/getYResolution()
+rangeY_ = (-Y, Y)
 
-# scale y-axis.
-YY_ = 255
-vMax_ = 5
+# max time on x-axis
+T_ = 0.2
+rangeX_ = (0, T_)

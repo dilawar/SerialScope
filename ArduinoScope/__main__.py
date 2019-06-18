@@ -3,10 +3,10 @@ __copyright__        = "Copyright 2019-, Dilawar Singh"
 __maintainer__       = "Dilawar Singh"
 __email__            = "dilawars@ncbs.res.in"
 
-from ArduinoScope import arduinoscope
+from ArduinoScope import scope
 
 def main(args):
-    arduinoscope.main(args)
+    scope.main(args)
 
 if __name__ == '__main__':
     import argparse

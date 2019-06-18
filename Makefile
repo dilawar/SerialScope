@@ -3,3 +3,6 @@ all : arduino
 
 arduino:
 	cd ./SignalGenerator && make upload
+
+test :
+	python3 -m ArduinoScope

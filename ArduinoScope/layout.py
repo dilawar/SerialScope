@@ -16,8 +16,8 @@ from ArduinoScope import guihelper as GH
 W = config.w_
 H = config.h_
 
-maxX = config.T_
-maxY = config.Y_
+maxX = config.rangeX_[1]
+maxY = config.rangeY_[1]
 nFrames = 0
 
 # Two graphs. One for channel 1 and other for channel 2.
@@ -32,51 +32,46 @@ artifactTab = sg.Tab( 'Data', []
         , [[sg.Canvas(size=(config.w_*2//3,config.h_), key='data')]]
         )
 
-# ------ Column Definition ------ #
-column1 = [
-    [ sg.Text('Column 1',
-                background_color='lightblue',
-                justification='center',
-                size=(10, 1))
-    ], 
-    [sg.Spin(values=('Spin Box 1', '2', '3'), initial_value='Spin Box 1')],
-    [sg.Spin(values=('Spin Box 1', '2', '3'), initial_value='Spin Box 2')],
-    [sg.Spin(values=('Spin Box 1', '2', '3'), initial_value='Spin Box 3')]
-]
+# Time axis widgets.
+xWidgets = sg.Frame('X-axis', [
+    [ sg.Slider(range=(2, 100, 2),
+        orientation='h', size=(20, 10), default_value=10,
+        enable_events=True,
+        tick_interval=10,
+        key="xaxis-resolution"
+        )]
+    ])
 
-sigGen = sg.Frame('Signal Generator'
-        , [
-            [ sg.Radio("Random", "SignalGenFunc"), sg.Radio("Step", "SignalGenFunc")],
-            [sg.Slider(range=(1,100), orientation='v', size=(5, 20), default_value=25),
-            sg.Slider(range=(1, 100), orientation='v', size=(5, 20), default_value=75),
-            sg.Slider(range=(1, 100), orientation='v', size=(5, 20), default_value=10)]
-         ]
-        )
-
-oscWidgets = sg.Frame('Functions', [[
+chAWidgets = sg.Frame('Channel A', [[
     sg.Slider(range=(1, 100),
-              orientation='v',
-              size=(5, 20),
-              default_value=25,
-              tick_interval=25),
+        orientation='v',
+        size=(5, 20),
+        default_value=25,
+        tick_interval=25),
     sg.Slider(range=(1, 100), orientation='v', size=(5, 20), default_value=75),
     sg.Slider(range=(1, 100), orientation='v', size=(5, 20), default_value=10),
-    #  sg.Column(column1, background_color='lightblue')
-]])
+    ]])
 
-widgets = sg.Column([[], [oscWidgets]])
+chBWidgets = sg.Frame('Channel B', [[
+    sg.Slider(range=(1, 100),
+        orientation='v',
+        size=(5, 20),
+        default_value=25,
+        tick_interval=25),
+    sg.Slider(range=(1, 100), orientation='v', size=(5, 20), default_value=75),
+    sg.Slider(range=(1, 100), orientation='v', size=(5, 20), default_value=10),
+    ]])
 
+# Constuct layout.
+widgets = sg.Column([[xWidgets], [chAWidgets], [chBWidgets]], key="widgets")
 layout = [
         [sg.TabGroup([[currentTab, artifactTab]]), widgets]
-        , [
-            sg.Submit('Bored?', key='bored')
-            , sg.Submit('PAUSE', key='toggle_run')
-            , sg.Exit('Quit', key='quit')
-        ]]
+        , [ sg.Submit('PAUSE', key='toggle_run') , sg.Exit('Quit', key='quit') ] 
+        ]
 
 # We want it global. Otherwise garbage collected will destroy the images.
 images_ = {}
-mainWindow = sg.Window('NeuroScope').Layout(layout).Finalize()
+mainWindow = sg.Window('Arduino Scope').Layout(layout).Finalize()
 
 graph_ = mainWindow.FindElement("graph")
 GH.draw_axis(graph_)

@@ -39,7 +39,6 @@ def main(args):
 
     while True:
         event, values = window.Read()
-        print(event, values)
         if event is None or event.lower() == 'quit':  
             clientDone = True
             time.sleep(0.1)
@@ -54,7 +53,12 @@ def main(args):
                 # stop the recording.
                 e.Update(text="START")
                 GH.freeze_ = True
+        elif event.lower() == "xaxis-resolution":
+            e = window.FindElement("xaxis-resolution")
+            v = values['xaxis-resolution']
+            GH.updateXAxisResolution(v)
         else:
+            logger.info( f"Event: {event} and {values}")
             logger.warn( 'Unsupported event' )
     window.Close()
     logger.info( f"ALL DONE. Window is closed." )
