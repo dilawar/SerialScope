@@ -15,8 +15,6 @@ logger = C.logger
 class Channel():
     def __init__(self, graph, **kwargs):
         self.graph = graph
-        self.xScale = 1.0
-        self.yScale = 1.0
         self.lines = []
         self.color = kwargs.get('color', 'white')
         self.nData = 0
@@ -24,6 +22,8 @@ class Channel():
         self.freeze = False
         self.prev = (0.0, 0.0)
         self.curr = self.prev
+        self.xScale = 1.0
+        self.yScale = 1.0
         self.xRange = (0, 0.2)
         self.yRange = (0, 255)
         self.xStep = 10e-3
@@ -66,10 +66,9 @@ class Channel():
         ys = np.arange(self.yRange[0], self.yRange[1], 255/5)
         for y in ys:
             gl = self.graph.DrawLine((self.xRange[0], self.offset+y),
-                    (self.xRange[1], self.offset+y),
-                    color=self.gridColor)
+                                     (self.xRange[1], self.offset+y),
+                                     color=self.gridColor)
             self.gridLines.append(gl)
-
 
     def draw_value(self):
         t1, y1 = self.curr
@@ -81,6 +80,10 @@ class Channel():
             color=self.color)
         self.lines.append(l)
 
+    def changeResolutionXAxis(self, v):
+        # changing x-axis resolution.
+        self.xScale = 10.0/max(0.1, v)
+
     def add_value(self, t1, y1):
         """
         Add value to channel, draw it and update the canvas.
@@ -88,7 +91,7 @@ class Channel():
         """
         self.nData += 1
         t0, y0 = self.prev
-        t1 = t1 % C.T_
+        t1 = t1 % (C.T_/self.xScale)
         self.curr = t1, y1
         if t0 >= t1:
             # This is NOT obvious. But when freeze is set True by a key-press, we wait
@@ -148,7 +151,6 @@ class ScopeGUI():
         else:
             self.channels[channel].freeze = False
 
-
     def init_channels(self):
         for c in self.channels:
             ch = self.channels[c]
@@ -175,3 +177,8 @@ class ScopeGUI():
     def add_values(self, t1, a1, b1):
         self.channels["A"].add_value(t1, a1)
         self.channels["B"].add_value(t1, b1)
+
+    def changeResolutionXAxis(self, v):
+        logger.info(f"Updating x-resolution to {v}")
+        for c in self.channels:
+            self.channels[c].changeResolutionXAxis(v)

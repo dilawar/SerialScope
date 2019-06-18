@@ -33,17 +33,15 @@ class Scope(gui.ScopeGUI):
         if event.lower() == 'toggle_run':
             e = self.window.FindElement("toggle_run")
             if e.GetText() == "START":
-                # start the recording again.
                 e.Update(text="PAUSE")
-                self.freeze()
-            else:
-                # stop the recording.
-                e.Update(text="START")
                 self.unFreeze()
+            else:
+                e.Update(text="START")
+                self.freeze()
         elif event.lower() == "xaxis-resolution":
             e = self.window.FindElement("xaxis-resolution")
             v = values['xaxis-resolution']
-            self.updateXAxisResolution(v)
+            self.changeResolutionXAxis(v)
         else:
             logger.info( f"Event: {event} and {values}")
             logger.warn( 'Unsupported event' )

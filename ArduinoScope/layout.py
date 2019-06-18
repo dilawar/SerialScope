@@ -32,9 +32,10 @@ artifactTab = sg.Tab( 'Data', []
         )
 
 # Time axis widgets.
-xWidgets = sg.Frame('X-axis', [
+xWidgets = sg.Frame('X-axis: ms/section', [
     [ sg.Slider(range=(0, 100, 10),
-        orientation='h', size=(20, 15), default_value=10,
+        orientation='h', size=(20, 15)
+        , default_value=10,
         enable_events=True,
         tick_interval=10,
         key="xaxis-resolution"

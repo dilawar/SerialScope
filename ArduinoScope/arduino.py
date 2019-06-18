@@ -12,6 +12,7 @@ import serial
 import time
 import multiprocessing as mp 
 import random
+import math
 from ArduinoScope.config import logger
 
 all_done_ = False
@@ -32,8 +33,9 @@ class SerialReader():
     def run_without_arduino(self, q, done):
         t0 = time.time()
         while True:
-            a, b = random.randint(0, 256), random.randint(0, 256)
+            #  a, b = random.randint(0, 256), random.randint(0, 256)
             t = time.time() - t0
+            a, b = (1+math.sin(2*math.pi*100*t))*128, (1+math.cos(2*math.pi*50*t))*128
             q.put((t, a, b))
             time.sleep(0.0005)
             if done.value == 1:
