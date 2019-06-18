@@ -44,7 +44,7 @@ class Scope(gui.ScopeGUI):
             self.changeResolutionXAxis(v)
         else:
             logger.info( f"Event: {event} and {values}")
-            logger.warn( 'Unsupported event' )
+            logger.warn( f'Unsupported event' )
 
     def run(self):
         while True:
