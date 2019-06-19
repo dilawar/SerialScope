@@ -63,7 +63,7 @@ chAWidgets = sg.Frame('Channel A', [
             orientation='h',
             size=sliderSize_,
             enable_events=True,
-            default_value=0,
+            default_value=-5,
             resolution=0.1,
             tick_interval=2,
             key="channel-a-offset"
@@ -71,6 +71,7 @@ chAWidgets = sg.Frame('Channel A', [
         ])
 
 
+# Make sure that default value of offsets are same as in GUI.
 chBWidgets = sg.Frame('Channel B', [
     [ sg.Text("V/div", size=labelSize_, auto_size_text=True),
         sg.Slider(range=(0, 2),
@@ -87,7 +88,7 @@ chBWidgets = sg.Frame('Channel B', [
               orientation='h',
               size=sliderSize_,
               enable_events=True,
-              default_value=0,
+              default_value=1.0,
               resolution=0.1,
               tick_interval=2.0,
               key="channel-b-offset"
