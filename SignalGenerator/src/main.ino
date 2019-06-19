@@ -53,7 +53,6 @@ char channel(char cmd)
 {
     // analogRead is 10 bit. So we scale is to 8 bits before sending it. This is
     // less accurate but we can send 4 times more data.
-
     size_t TIME_PERIOD = 10000; // In uS
 
     if(cmd == 's')
@@ -147,15 +146,22 @@ bool is_command_read( )
     return false;
 }
 
+char intToChar( int val)
+{
+    char x = (char) (255 * val / 1023);
+    return x;
+}
 
 char channel_1()
 {
-    return channel(subcommand_[0]);
+    //return channel(subcommand_[0]);
+    return intToChar(analogRead(A0));
 }
 
 char channel_2()
 {
-    return channel(subcommand_[1]);
+    //return channel(subcommand_[1]);
+    return intToChar(analogRead(A1));
 }
 
 
@@ -181,6 +187,10 @@ void setup()
     wdt_reset();
 
     t_ = millis();
+
+    // Set analog MODE to input. This is default (I guess).
+    pinMode(A0, INPUT);
+    pinMode(A1, INPUT);
 }
 
 void loop()

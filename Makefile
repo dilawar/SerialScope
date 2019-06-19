@@ -1,5 +1,5 @@
 all : arduino
-	python3 ./main.py
+	python3 -m ArduinoScope
 
 arduino:
 	cd ./SignalGenerator && make upload
