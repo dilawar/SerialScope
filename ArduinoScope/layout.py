@@ -31,7 +31,7 @@ artifactTab = sg.Tab('Data', [], [[sg.Canvas(size=(config.w_*2//3, config.h_), k
                      )
 
 # Time axis widgets.
-xWidgets = sg.Frame('X: ms per sec', [
+xWidgets = sg.Frame('X: ms', [
     [sg.Slider(range=(0, 100, 10),
                orientation='h', size=(20, 15), default_value=10,
                enable_events=True,
@@ -40,25 +40,29 @@ xWidgets = sg.Frame('X: ms per sec', [
                )]
 ])
 
-chAWidgets = sg.Frame('Channel A: V per sec', [[
-    sg.Slider(range=(0, 10, 1),
+chAWidgets = sg.Frame('Channel A: mV', [[
+    sg.Slider(range=(0, 2),
               orientation='h',
+              resolution=0.1,
               size=(20, 15),
               enable_events=True,
-              default_value=1,
-              tick_interval=1,
+              default_value=1.0,
+              tick_interval=0.5,
               key="channel-a-resolution"
               ),
 ]])
 
-chBWidgets = sg.Frame('Channel B', [[
-    sg.Slider(range=(1, 100),
-              orientation='v',
-              size=(5, 20),
-              default_value=25,
-              tick_interval=25),
-    sg.Slider(range=(1, 100), orientation='v', size=(5, 20), default_value=75),
-    sg.Slider(range=(1, 100), orientation='v', size=(5, 20), default_value=10),
+
+chBWidgets = sg.Frame('Channel B: mV', [[
+    sg.Slider(range=(0, 2),
+              orientation='h',
+              resolution=0.1,
+              size=(20, 15),
+              enable_events=True,
+              default_value=1.0,
+              tick_interval=0.5,
+              key="channel-b-resolution"
+              ),
 ]])
 
 # Constuct layout.

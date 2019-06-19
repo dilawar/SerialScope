@@ -29,7 +29,6 @@ class Scope(gui.ScopeGUI):
         if event is None or event.lower() == 'quit':  
             self.done = True
             return
-
         if event.lower() == 'toggle_run':
             e = self.window.FindElement("toggle_run")
             if e.GetText() == "START":
@@ -42,6 +41,12 @@ class Scope(gui.ScopeGUI):
             e = self.window.FindElement("xaxis-resolution")
             v = values['xaxis-resolution']
             self.changeResolutionXAxis(v)
+        elif event.lower() == 'channel-a-resolution':
+            v = values['channel-a-resolution']
+            self.changeResolutionChannel(v, 'A')
+        elif event.lower() == 'channel-b-resolution':
+            v = values['channel-b-resolution']
+            self.changeResolutionChannel(v, 'B')
         else:
             logger.info( f"Event: {event} and {values}")
             logger.warn( f'Unsupported event' )

@@ -11,7 +11,6 @@ from ArduinoScope import config as C
 
 logger = C.logger
 
-
 class Channel():
     def __init__(self, graph, **kwargs):
         self.graph = graph
@@ -83,6 +82,9 @@ class Channel():
     def changeResolutionXAxis(self, v):
         # changing x-axis resolution.
         self.xScale = 10.0/max(0.1, v)
+
+    def changeResolutionYAxis(self, v):
+        self.yScale = 1.0/max(0.01, v)
 
     def add_value(self, t1, y1):
         """
@@ -182,3 +184,7 @@ class ScopeGUI():
         logger.info(f"Updating x-resolution to {v}")
         for c in self.channels:
             self.channels[c].changeResolutionXAxis(v)
+
+    def changeResolutionChannel(self, v, channelName):
+        self.channels[channelName].changeResolutionYAxis(v)
+
