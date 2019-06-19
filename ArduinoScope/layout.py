@@ -29,41 +29,70 @@ graph = sg.Graph(canvas_size=(W*2//3, 2*H//3),
 currentTab = sg.Tab('Live', [[graph]])
 artifactTab = sg.Tab('Data', [], [[sg.Canvas(size=(config.w_*2//3, config.h_), key='data')]]
                      )
+# parameters.
+labelSize_ = (6, 1)
+sliderSize_ = (18,15)
+
 
 # Time axis widgets.
-xWidgets = sg.Frame('X: ms', [
-    [sg.Slider(range=(0, 100, 10),
-               orientation='h', size=(20, 15), default_value=10,
+xWidgets = sg.Frame('Time Axis', [
+    [sg.Text("ms/div", size=labelSize_)
+        , sg.Slider(range=(0, 100, 10),
+               orientation='h', size=sliderSize_,
+               default_value=10,
                enable_events=True,
                tick_interval=10,
                key="xaxis-resolution"
                )]
 ])
 
-chAWidgets = sg.Frame('Channel A: mV', [[
-    sg.Slider(range=(0, 2),
-              orientation='h',
-              resolution=0.1,
-              size=(20, 15),
-              enable_events=True,
-              default_value=1.0,
-              tick_interval=0.5,
-              key="channel-a-resolution"
-              ),
-]])
+chAWidgets = sg.Frame('Channel A', [
+    [sg.Text("V/div", size=labelSize_, auto_size_text=True),
+        sg.Slider(range=(0, 2),
+            orientation='h',
+            resolution=0.1,
+            size=sliderSize_,
+            enable_events=True,
+            default_value=1.0,
+            tick_interval=0.5,
+            key="channel-a-resolution"
+            )
+        ],
+    [ sg.Text("Offset", size=labelSize_, auto_size_text=True)
+        , sg.Slider(range=(-5, 5),
+            orientation='h',
+            size=sliderSize_,
+            enable_events=True,
+            default_value=0,
+            resolution=0.1,
+            tick_interval=2,
+            key="channel-a-offset"
+            )],
+        ])
 
 
-chBWidgets = sg.Frame('Channel B: mV', [[
-    sg.Slider(range=(0, 2),
+chBWidgets = sg.Frame('Channel B', [
+    [ sg.Text("V/div", size=labelSize_, auto_size_text=True),
+        sg.Slider(range=(0, 2),
+            orientation='h',
+            resolution=0.1,
+            size=sliderSize_,
+            enable_events=True,
+            default_value=1.0,
+            tick_interval=0.5,
+            key="channel-b-resolution"
+            )],
+    [ sg.Text("Offset", size=labelSize_, auto_size_text=True),
+        sg.Slider(range=(-5, 5),
               orientation='h',
-              resolution=0.1,
-              size=(20, 15),
+              size=sliderSize_,
               enable_events=True,
-              default_value=1.0,
-              tick_interval=0.5,
-              key="channel-b-resolution"
-              ),
-]])
+              default_value=0,
+              resolution=0.1,
+              tick_interval=2.0,
+              key="channel-b-offset"
+              )],
+])
 
 # Constuct layout.
 widgets = sg.Column([[xWidgets], [chAWidgets], [chBWidgets]], key="widgets")

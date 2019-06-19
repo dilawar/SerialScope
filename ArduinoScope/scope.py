@@ -47,6 +47,12 @@ class Scope(gui.ScopeGUI):
         elif event.lower() == 'channel-b-resolution':
             v = values['channel-b-resolution']
             self.changeResolutionChannel(v, 'B')
+        elif event.lower() == "channel-a-offset":
+            v = values["channel-a-offset"]
+            self.changeOffsetChannel(v, "A")
+        elif event.lower() == "channel-b-offset":
+            v = values["channel-b-offset"]
+            self.changeOffsetChannel(v, "B")
         else:
             logger.info( f"Event: {event} and {values}")
             logger.warn( f'Unsupported event' )

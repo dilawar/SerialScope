@@ -12,6 +12,9 @@ from ArduinoScope import config as C
 logger = C.logger
 
 class Channel():
+    """
+    Class for handling channel.
+    """
     def __init__(self, graph, **kwargs):
         self.graph = graph
         self.lines = []
@@ -25,6 +28,7 @@ class Channel():
         self.yScale = 1.0
         self.xRange = (0, 0.2)
         self.yRange = (0, 255)
+        self.resolution = 5.0 / self.yRange[1]
         self.xStep = 10e-3
         self.axLine = None
         self.gridLines = []
@@ -85,6 +89,11 @@ class Channel():
 
     def changeResolutionYAxis(self, v):
         self.yScale = 1.0/max(0.01, v)
+
+    def changeOffsetChannel(self, v):
+        logger.info(f"Channel offset to {v} volt.")
+        # This is in volt. Change to pixels. Divide by resolution.
+        self.offset = v / self.resolution
 
     def add_value(self, t1, y1):
         """
@@ -187,4 +196,8 @@ class ScopeGUI():
 
     def changeResolutionChannel(self, v, channelName):
         self.channels[channelName].changeResolutionYAxis(v)
+
+    def changeOffsetChannel(self, v, channelName):
+        self.channels[channelName].changeOffsetChannel(v)
+
 
