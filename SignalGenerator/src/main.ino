@@ -148,7 +148,7 @@ bool is_command_read( )
 
 char intToChar( int val)
 {
-    char x = (char) (255 * val / 1023);
+    char x = (char) (255.0 * val/1023.0);
     return x;
 }
 
@@ -191,11 +191,14 @@ void setup()
     // Set analog MODE to input. This is default (I guess).
     pinMode(A0, INPUT);
     pinMode(A1, INPUT);
+
+    pinMode(8, OUTPUT);
 }
 
 void loop()
 {
     reset_watchdog();
+    tone(8, 40);
     is_command_read();
     write_data_line();
 }

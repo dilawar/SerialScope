@@ -77,8 +77,8 @@ def main(args):
     arduinoQ = mp.Queue()
     clientDone = mp.Value('d', 0)
     arduinoClient = arduino.SerialReader(args.port, args.baudrate)
-    #  arduinoP = mp.Process(target=arduinoClient.run, args=(arduinoQ, clientDone))
-    arduinoP = mp.Process(target=arduinoClient.run_without_arduino, args=(arduinoQ, clientDone))
+    arduinoP = mp.Process(target=arduinoClient.run, args=(arduinoQ, clientDone))
+    #  arduinoP = mp.Process(target=arduinoClient.run_without_arduino, args=(arduinoQ, clientDone))
     arduinoP.daemon = True
     arduinoP.start()
 
