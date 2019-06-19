@@ -72,6 +72,9 @@ class SerialReader():
         logger.info( f"Calling close." )
         self.s.close()
 
+def pygnuplot(q):
+    print( "Plotting" )
+
 def test():
     s = SerialReader( '/dev/ttyACM0', 115200)
     q = mp.Queue()
