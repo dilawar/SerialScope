@@ -55,13 +55,14 @@ class SerialReader():
             return 
 
         t0 = time.time()
+        a, b = 0, 0
         while True:
-            a, b = self.s.read(), self.s.read()
+            a, b = self.s.read(1), self.s.read(1)
             t = time.time() - t0
             q.put((t, ord(a), ord(b)))
-            if done.value == 1:
-                logger.info( 'STOP acquiring data.' )
-                break
+            #  if done.value == 1:
+                #  logger.info( 'STOP acquiring data.' )
+                #  break
         self.done = True
         self.close()
         q.close()

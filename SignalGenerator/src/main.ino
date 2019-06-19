@@ -174,6 +174,7 @@ void write_data_line( )
 {
     Serial.print(channel_1());
     Serial.print(channel_2());
+    Serial.flush();
 }
 
 void setup()
@@ -193,12 +194,12 @@ void setup()
     pinMode(A1, INPUT);
 
     pinMode(8, OUTPUT);
+    tone(8, 100);
 }
 
 void loop()
 {
-    reset_watchdog();
-    tone(8, 40);
-    is_command_read();
+    //is_command_read();
     write_data_line();
+    reset_watchdog();
 }
