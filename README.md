@@ -62,3 +62,7 @@ void write_data_line( )
     Serial.flush();
 }
 ```
+
+# CHANGELOG
+
+- v0.0.1: Initial release 
