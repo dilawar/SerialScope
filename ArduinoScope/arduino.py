@@ -14,13 +14,12 @@ import threading
 import math
 import queue
 
-import PyGnuplot as gp
-gp.default_term = 'x11'
-
 import logging
 logger = logging.getLogger("arduino")
 
 all_done_ = False
+import PyGnuplot as gp
+gp.default_term = 'x11'
 
 class SerialReader():
     """docstring for SerialReader"""
@@ -89,6 +88,7 @@ class SerialReader():
             T, X, Y = zip(*self.temp)
             gp.s([T, X, Y])
             gp.c('plot "tmp.dat" u 1:3 w lp')
+            gp.c('replot "tmp.dat" u 1:2 w lp')
             self.temp = self.temp[-100:]
 
 def pygnuplot(q):
