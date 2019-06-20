@@ -6,9 +6,6 @@ __email__            = "dilawars@ncbs.res.in"
 from SerialScope import scope
 
 def main(args):
-    scope.main(args)
-
-if __name__ == '__main__':
     import argparse
     # Argument parser.
     description = '''Arduino NeuroScope.'''
@@ -24,4 +21,7 @@ if __name__ == '__main__':
     class Args: pass
     args = Args()
     parser.parse_args(namespace=args)
-    main(args)
+    scope.main(args)
+
+if __name__ == '__main__':
+    main()
