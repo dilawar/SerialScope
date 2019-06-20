@@ -8,7 +8,7 @@ __email__            = "dilawars@ncbs.res.in"
 __status__           = "Development"
 
 import logging
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.WARNING,
     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
     )
 logger = logging.getLogger('scope')
