@@ -70,7 +70,7 @@ char channel(char cmd)
     if(cmd == 'r')
         return random(0, 255);
     else
-        return random(0, 100);
+        return random(0, 40);
 }
 
 
@@ -146,34 +146,20 @@ bool is_command_read( )
     return false;
 }
 
+// Two critical functions.
 char intToChar( int val)
 {
+    // analogRead is 10 bits. Change it to 8 bits.
     char x = (char) (255.0 * val/1023.0);
     return x;
 }
 
-char channel_1()
-{
-    //return channel(subcommand_[0]);
-    return intToChar(analogRead(A0));
-}
-
-char channel_2()
-{
-    //return channel(subcommand_[1]);
-    return intToChar(analogRead(A1));
-}
-
-
-/**
- * @brief Write data line to Serial port in csv format.
- * @param data
- * @param timestamp
- */
 void write_data_line( )
 {
-    Serial.print(channel_1());
-    Serial.print(channel_2());
+    char a = intToChar(analogRead(A0));
+    char b = intToChar(analogRead(A1));
+    Serial.print(a);
+    Serial.print(b);
     Serial.flush();
 }
 
@@ -193,7 +179,7 @@ void setup()
     pinMode(A0, INPUT);
     pinMode(A1, INPUT);
 
-    tone(8, 100);
+    tone(8, 40);
 }
 
 void loop()

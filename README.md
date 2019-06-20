@@ -1,1 +1,59 @@
 A serial port oscilloscope. 
+
+![](./assests/v0.0.1.png)
+
+# Install
+
+    $ pip install SerialScope --user 
+
+After installation, launch it by following command,
+
+    $ serialscope
+
+The default baud rate are serial port is `115400` and  `/dev/ttyACM0`
+respectively. You can change these values from command line
+
+```
+usage: serialscope [-h] [--port PORT] [--baudrate BAUDRATE]
+
+Arduino NeuroScope.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --port PORT, -p PORT  Input file
+  --baudrate BAUDRATE, -B BAUDRATE
+                        Baudrate of Arduino board.
+
+```
+
+# How it works
+
+This oscilloscope has two channels.  It assumes that 1 byte of data is sent
+for each channel. That means you have 255 levels. If you are using arduino board
+analog pins to read data, then your resolution would be `5/255` volts.
+
+## Arduino board
+
+__If you are using Arduino board and `analogRead` function, note
+that `analogRead` return 10 bit value i.e., between 0 and 1023. You should scale
+to 255. Following is the snippet, you can use in sketch.
+
+```
+// Two critical functions.
+char intToChar( int val)
+{
+    // analogRead is 10 bits. Change it to 8 bits.
+    char x = (char) (255.0 * val/1023.0);
+    return x;
+}
+
+void write_data_line( )
+{
+    // channel A is on pin A0 and channel B is on A1
+    char a = intToChar(analogRead(A0));
+    char b = intToChar(analogRead(A1));
+    Serial.print(a);
+    Serial.print(b);
+    Serial.flush();
+}
+```
