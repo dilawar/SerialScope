@@ -10,7 +10,7 @@ After installation, launch it by following command,
 
     $ serialscope
 
-The default baud rate are serial port is `115400` and  `/dev/ttyACM0`
+The default baud rate are serial port is `115200` and  `/dev/ttyACM0`
 respectively. You can change these values from command line
 
 ```
@@ -20,7 +20,7 @@ Arduino NeuroScope.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --port PORT, -p PORT  Input file
+  --port PORT, -p PORT  Serial port.
   --baudrate BAUDRATE, -B BAUDRATE
                         Baudrate of Arduino board.
 
@@ -34,9 +34,12 @@ analog pins to read data, then your resolution would be `5/255` volts.
 
 ## Arduino board
 
-__If you are using Arduino board and `analogRead` function, note
-that `analogRead` return 10 bit value i.e., between 0 and 1023. You should scale
-to 255. Following is the snippet, you can use in sketch.
+Function `analogRead` returns 10 bit value i.e., between 0 and 1023. You should
+scale it to 255, cast it to `char` before writing to serial port. 
+You can use following snippets in your sketch.
+
+Make sure that your arduino is set to use maximum possible baud-rate. I have
+used 115200 baud rate.,
 
 ```
 // Two critical functions.

@@ -11,7 +11,8 @@ def main(args=None):
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--port', '-p', type=str
             , default = '/dev/ttyACM0'
-            , required = False, help = 'Input file'
+            , required = False
+            , help = 'Serial port.'
             )
     parser.add_argument('--baudrate', '-B'
             , required = False, default = 115200
