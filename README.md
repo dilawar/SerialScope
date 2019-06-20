@@ -1,3 +1,5 @@
+[![PyPI version](https://badge.fury.io/py/SerialScope.svg)](https://badge.fury.io/py/SerialScope)
+
 A serial port oscilloscope. 
 
 ![](./assests/v0.0.1.png)
