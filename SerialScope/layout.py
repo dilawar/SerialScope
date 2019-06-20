@@ -24,7 +24,9 @@ graph = sg.Graph(canvas_size=(W * 2 // 3, 2 * H // 3),
                  graph_bottom_left=(0, -maxY),
                  graph_top_right=(maxX, maxY),
                  background_color='black',
-                 key='graph')
+                 enable_events=True,
+                 key='graph'
+                 )
 
 #  currentTab = sg.Tab('Live', [[graph]])
 #  artifactTab = sg.Tab(

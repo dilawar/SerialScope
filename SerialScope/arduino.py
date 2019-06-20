@@ -36,12 +36,10 @@ class SerialReader():
     def run_without_arduino(self, q, done):
         t0 = time.time()
         while True:
-            #  a, b = random.randint(0, 256), random.randint(0, 256)
             t = time.time() - t0
             a, b = (1+math.sin(2*math.pi*100*t))*128, (1+math.cos(2*math.pi*50*t))*128
             q.put((t, a, b))
             self.temp.append((t,a,b))
-            time.sleep(0.0005)
             if done.value == 1:
                 logger.info( 'STOP acquiring data.' )
                 break

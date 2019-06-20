@@ -48,5 +48,5 @@ Y = resolutions_[1] + 2.0/getYResolution()
 rangeY_ = (-Y, Y)
 
 # max time on x-axis
-T_ = 0.2
+T_ = 200    # ms
 rangeX_ = (0, T_)

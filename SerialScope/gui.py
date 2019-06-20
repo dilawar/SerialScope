@@ -29,10 +29,10 @@ class Channel():
         self.curr = self.prev
         self.xScale = 1.0
         self.yScale = 1.0
-        self.xRange = (0, 0.2)
+        self.xRange = C.rangeX_
         self.yRange = (0, 255)
         self.resolution = 5.0 / self.yRange[1]
-        self.xStep = 10e-3
+        self.xStep = 10 # ms
         self.axLine = None
         self.gridLines = []
         self.gridColor = kwargs.get('grid_color', 'gray25')
@@ -69,7 +69,8 @@ class Channel():
             self.gridLines.append(gl)
 
         # draw y grid. 1 section == 1 volt.
-        ys = arange(self.yRange[0], self.yRange[1], 255/5)
+        dy = 255//5
+        ys = arange(self.yRange[0], self.yRange[1]+dy, dy)
         for y in ys:
             gl = self.graph.DrawLine((self.xRange[0], self.offset+y),
                                      (self.xRange[1], self.offset+y),
@@ -150,6 +151,7 @@ class ScopeGUI():
         self.topRight = (C.T_, 255)
         self.rect = (self.bottomLeft, self.topRight)
         self.init_channels()
+        self.canvas().config(cursor='cross')
 
     def freeze(self, channel=None):
         if channel is None:
@@ -177,7 +179,7 @@ class ScopeGUI():
         return self.window.FindElement("graph")
 
     def canvas(self):
-        return self.graph().TkCanvas
+        return self.graph().TKCanvas
 
     def attach_label(self):
         if 'label' in self.elems:
@@ -189,8 +191,9 @@ class ScopeGUI():
             self.channels[ch].draw_axis()
 
     def add_values(self, t1, a1, b1):
-        self.channels["A"].add_value(t1, a1)
-        self.channels["B"].add_value(t1, b1)
+        # Time is in ms.
+        self.channels["A"].add_value(1000*t1, a1)
+        self.channels["B"].add_value(1000*t1, b1)
 
     def changeResolutionXAxis(self, v):
         logger.info(f"Updating x-resolution to {v}")
@@ -202,5 +205,9 @@ class ScopeGUI():
 
     def changeOffsetChannel(self, v, channelName):
         self.channels[channelName].changeOffsetChannel(v)
+
+    def handleMouseEvent(self, event, value):
+        print(f"Event {event} with value {value}")
+        self.canvas().config(cursor='plus')
 
 

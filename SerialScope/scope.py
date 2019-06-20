@@ -39,23 +39,25 @@ class Scope(gui.ScopeGUI):
                 self.freeze()
         elif event.lower() == "xaxis-resolution":
             e = self.window.FindElement("xaxis-resolution")
-            v = values['xaxis-resolution']
+            v = values[event]
             self.changeResolutionXAxis(v)
         elif event.lower() == 'channel-a-resolution':
-            v = values['channel-a-resolution']
+            v = values[event]
             self.changeResolutionChannel(v, 'A')
         elif event.lower() == 'channel-b-resolution':
-            v = values['channel-b-resolution']
+            v = values[event]
             self.changeResolutionChannel(v, 'B')
         elif event.lower() == "channel-a-offset":
-            v = values["channel-a-offset"]
+            v = values[event]
             self.changeOffsetChannel(v, "A")
         elif event.lower() == "channel-b-offset":
-            v = values["channel-b-offset"]
+            v = values[event]
             self.changeOffsetChannel(v, "B")
+        elif event.lower() == 'graph':
+            # handle graph events.
+            self.handleMouseEvent(event, values[event])
         else:
-            logger.info( f"Event: {event} and {values}")
-            logger.warn( f'Unsupported event' )
+            logger.warn( f"Event: Unsupported {event}/{values}" )
 
     def run(self):
         while True:
