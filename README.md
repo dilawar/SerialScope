@@ -76,4 +76,6 @@ void write_data_line( )
 
 # CHANGELOG
 
+- v0.0.3: Automatically install dependencies. 
+- v0.0.2: Deleted.
 - v0.0.1: Initial release 
