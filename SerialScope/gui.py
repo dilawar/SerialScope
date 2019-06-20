@@ -7,7 +7,7 @@ __email__ = "dilawars@ncbs.res.in"
 
 import numpy as np
 from collections import defaultdict
-from ArduinoScope import config as C
+from SerialScope import config as C
 
 logger = C.logger
 

@@ -3,7 +3,7 @@ __copyright__        = "Copyright 2019-, Dilawar Singh"
 __maintainer__       = "Dilawar Singh"
 __email__            = "dilawars@ncbs.res.in"
 
-from ArduinoScope import scope
+from SerialScope import scope
 
 def main(args):
     scope.main(args)

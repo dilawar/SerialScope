@@ -10,7 +10,7 @@ __status__ = "Development"
 import time
 import PySimpleGUI as sg
 
-from ArduinoScope import config
+from SerialScope import config
 
 W = config.w_
 H = config.h_

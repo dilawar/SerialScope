@@ -10,10 +10,10 @@ __status__           = "Development"
 import multiprocessing as mp
 import threading
 
-from ArduinoScope import arduino
-from ArduinoScope import layout 
-from ArduinoScope import gui 
-from ArduinoScope.config import logger
+from SerialScope import arduino
+from SerialScope import layout 
+from SerialScope import gui 
+from SerialScope.config import logger
 
 
 class Scope(gui.ScopeGUI):

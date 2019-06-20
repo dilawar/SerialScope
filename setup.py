@@ -16,5 +16,10 @@ setup(
     author = "Dilawar Singh",
     author_email = "dilawars@ncbs.res.in",
     url = "http://github.com/dilawar/SerialScope",
-    license='GPL',
+    license='GPLv3',
+    entry_points = {
+        'console_scripts' : [ 
+            'serialscope = SerialScope.__main__:main'
+            ],
+        }
 )
