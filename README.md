@@ -2,7 +2,7 @@
 
 A serial port oscilloscope. 
 
-![](./assests/v0.0.1.png)
+![](https://raw.githubusercontent.com/dilawar/SerialScope/master/assests/screenshot.png)
 
 # Install
 
