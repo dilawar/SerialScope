@@ -10,20 +10,27 @@ __status__           = "Development"
 
 import serial
 import time
-import multiprocessing as mp 
-import random
+import threading
 import math
-from ArduinoScope.config import logger
+import queue
+
+import PyGnuplot as gp
+gp.default_term = 'x11'
+
+import logging
+logger = logging.getLogger("arduino")
 
 all_done_ = False
 
 class SerialReader():
     """docstring for SerialReader"""
-    def __init__(self, port, baud):
+    def __init__(self, port, baud, debug = False):
         self.s = None
         self.port = port
         self.baud = baud
         self.s = None
+        self.temp = []
+        self.debug = debug
         try:
             self.s = serial.Serial(port, baud)
         except Exception:
@@ -37,6 +44,7 @@ class SerialReader():
             t = time.time() - t0
             a, b = (1+math.sin(2*math.pi*100*t))*128, (1+math.cos(2*math.pi*50*t))*128
             q.put((t, a, b))
+            self.temp.append((t,a,b))
             time.sleep(0.0005)
             if done.value == 1:
                 logger.info( 'STOP acquiring data.' )
@@ -60,9 +68,12 @@ class SerialReader():
             a, b = self.s.read(1), self.s.read(1)
             t = time.time() - t0
             q.put((t, ord(a), ord(b)))
-            #  if done.value == 1:
-                #  logger.info( 'STOP acquiring data.' )
-                #  break
+            if self.debug:
+                self.temp.append((t, ord(a), ord(b)))
+                self.plot()
+            if done == 1:
+                logger.info( 'STOP acquiring data.' )
+                break
         self.done = True
         self.close()
         q.close()
@@ -72,19 +83,27 @@ class SerialReader():
         logger.info( f"Calling close." )
         self.s.close()
 
+    def plot(self):
+        if len(self.temp) >= 100:
+            print( f"[INFO ] Plogging temp" )
+            T, X, Y = zip(*self.temp)
+            gp.s([T, X, Y])
+            gp.c('plot "tmp.dat" u 1:3 w lp')
+            self.temp = self.temp[-100:]
+
 def pygnuplot(q):
     print( "Plotting" )
 
 def test():
-    s = SerialReader( '/dev/ttyACM0', 115200)
-    q = mp.Queue()
-    done = mp.Value('d', 0)
-    t = mp.Process( target=s.run,  args=(q, done))
+    s = SerialReader( '/dev/ttyACM0', 115200, debug=True)
+    q = queue.Queue()
+    done = 0
+    t = threading.Thread( target=s.run,  args=(q, done))
+    t.daemon = True
     t.start()
-    time.sleep(10)
-    done.value = 1
-    print(q.qsize())
-    t.join()
+    time.sleep(200 )
+    done = 1
+    print(f"Total {q.qsize()} in 10 seconds.")
 
 if __name__ == '__main__':
     test()
