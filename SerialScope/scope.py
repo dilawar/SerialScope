@@ -73,7 +73,7 @@ def collect_data(q, scope):
     # filled by Arduino client and send those values to ScopeGUI. May be we can
     # let the ArduinoClient directly send values to ScopeGUI?
     while True:
-        scope.add_values(*q.get())
+        scope.add_values(q)
 
 def main(args):
     # Launch arduino reader.

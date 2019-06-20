@@ -210,22 +210,23 @@ class ScopeGUI():
         for ch in self.channels:
             self.channels[ch].draw_axis()
 
-    def add_values(self, t1, a1, b1):
-        # Time is in second here.
-        self.curr = t1, a1, b1
-        t0 = self.prev[0]
-        self.FS = (1.0/(t1 - t0) + self.N * self.FS)/(self.N+1)
-        self.N += 1
+    def add_values(self, q):
+        while q.qsize() > 1:
+            t1, a1, b1 = q.get()
+            # Time is in second here.
+            self.curr = t1, a1, b1
+            t0 = self.prev[0]
+            self.FS = (1.0/(t1 - t0) + self.N * self.FS)/(self.N+1)
+            self.N += 1
+            # These values are in ms.
+            self.channels["A"].add_value(1000*t1, a1)
+            self.channels["B"].add_value(1000*t1, b1)
+            self.prev = self.curr
 
-        # These values are in ms.
-        self.channels["A"].add_value(1000*t1, a1)
-        self.channels["B"].add_value(1000*t1, b1)
-        self.prev = self.curr
-        if self.N % 100:
-            self.canvas().update()
-            self.window.FindElement("FS").Update( 
-                    value=f"SR:{self.FS/1000.0:.1f} kHz"
-                    )
+        info=f"SR:{self.FS/1000.0:.1f} kHz"
+        info += f'\nSize: {q.qsize()}'
+        self.window.FindElement("INFO").Update(value=info)
+        self.canvas().update()
 
     def changeResolutionXAxis(self, v):
         logger.info(f"Updating x-resolution to {v}")

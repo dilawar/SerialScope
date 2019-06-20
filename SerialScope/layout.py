@@ -12,8 +12,8 @@ import PySimpleGUI as sg
 
 from SerialScope import config
 
-W = config.w_ / 1.25
-H = config.h_ / 1.1
+W = 1024 #config.w_ / 1.25
+H = 800 #config.h_ / 1.1
 
 maxX = config.rangeX_[1]
 maxY = config.rangeY_[1]
@@ -100,7 +100,7 @@ chBWidgets = sg.Frame('Channel B', [
     ],
 ])
 
-info = sg.Text( "Sampling Rate", key = "FS")
+info = sg.Text( "Sampling Rate", size=(50,2), key = "INFO")
 
 # Constuct layout.
 widgets = sg.Column([
