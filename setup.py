@@ -14,7 +14,7 @@ setup(
     long_description_content_type='text/markdown',
     packages = find_packages(),
     package_data = {},
-    install_requires = ['pysimgplegui', 'screeninfo', 'pyserial'],
+    install_requires = ['PySimpleGUI', 'screeninfo', 'pyserial'],
     author = "Dilawar Singh",
     author_email = "dilawars@ncbs.res.in",
     url = "http://github.com/dilawar/SerialScope",
