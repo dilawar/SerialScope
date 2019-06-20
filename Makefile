@@ -2,7 +2,7 @@ all : arduino
 	python3 -m SerialScope
 
 arduino:
-	cd ./SignalGenerator && make upload
+	cd ./arduino && make upload
 
 test :
 	python3 -m SerialScope
