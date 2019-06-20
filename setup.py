@@ -4,6 +4,7 @@ from setuptools import setup, find_packages
 
 with open("README.md") as f:
     readme = f.read()
+# 
 
 setup(
     name = "SerialScope",
@@ -13,7 +14,7 @@ setup(
     long_description_content_type='text/markdown',
     packages = find_packages(),
     package_data = {},
-    install_requires = [ ],
+    install_requires = ['pysimgplegui', 'screeninfo', 'pyserial'],
     author = "Dilawar Singh",
     author_email = "dilawars@ncbs.res.in",
     url = "http://github.com/dilawar/SerialScope",

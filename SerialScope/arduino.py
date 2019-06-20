@@ -18,10 +18,6 @@ import struct
 import logging
 logger = logging.getLogger("arduino")
 
-all_done_ = False
-import PyGnuplot as gp
-gp.default_term = 'x11'
-
 class SerialReader():
     """docstring for SerialReader"""
     def __init__(self, port, baud, debug = False):
@@ -73,9 +69,6 @@ class SerialReader():
             for i in range(N):
                 t, a, b = t0+i*dt, data[2*i], data[2*i+1]
                 q.put((t, a, b))
-                if self.debug:
-                    self.temp.append((t, ord(a), ord(b)))
-                    self.plot()
             if done == 1:
                 logger.info( 'STOP acquiring data.' )
                 break
@@ -87,15 +80,6 @@ class SerialReader():
     def close(self):
         logger.info( f"Calling close." )
         self.s.close()
-
-    def plot(self):
-        if len(self.temp) >= 100:
-            print( f"[INFO ] Plogging temp" )
-            T, X, Y = zip(*self.temp)
-            gp.s([T, X, Y])
-            gp.c('plot "tmp.dat" u 1:3 w lp')
-            gp.c('replot "tmp.dat" u 1:2 w lp')
-            self.temp = self.temp[-100:]
 
 def pygnuplot(q):
     print( "Plotting" )
