@@ -5,11 +5,14 @@ __copyright__ = "Copyright 2019-, Dilawar Singh"
 __maintainer__ = "Dilawar Singh"
 __email__ = "dilawars@ncbs.res.in"
 
-import numpy as np
 from collections import defaultdict
 from SerialScope import config as C
 
 logger = C.logger
+
+def arange(minV, maxV, step):
+    vals = [ minV + i*step for i in range(0, int((maxV - minV)/step))]
+    return vals
 
 class Channel():
     """
@@ -58,7 +61,7 @@ class Channel():
         self.gridLines.clear()
 
         # draw new grid.
-        xs = np.arange(self.xRange[0], self.xRange[1], self.xStep)
+        xs = arange(self.xRange[0], self.xRange[1], self.xStep)
         for x in xs:
             gl = self.graph.DrawLine((x, self.offset + self.yRange[0]),
                                      (x, self.offset + self.yRange[1]),
@@ -66,7 +69,7 @@ class Channel():
             self.gridLines.append(gl)
 
         # draw y grid. 1 section == 1 volt.
-        ys = np.arange(self.yRange[0], self.yRange[1], 255/5)
+        ys = arange(self.yRange[0], self.yRange[1], 255/5)
         for y in ys:
             gl = self.graph.DrawLine((self.xRange[0], self.offset+y),
                                      (self.xRange[1], self.offset+y),

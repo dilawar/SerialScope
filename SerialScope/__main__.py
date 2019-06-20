@@ -4,10 +4,9 @@ __maintainer__       = "Dilawar Singh"
 __email__            = "dilawars@ncbs.res.in"
 
 from SerialScope import scope
+import argparse
 
-def main(args):
-    import argparse
-    # Argument parser.
+def main(args=None):
     description = '''Arduino NeuroScope.'''
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--port', '-p', type=str
