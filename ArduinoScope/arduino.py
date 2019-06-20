@@ -13,6 +13,7 @@ import time
 import threading
 import math
 import queue
+import struct
 
 import logging
 logger = logging.getLogger("arduino")
@@ -62,14 +63,19 @@ class SerialReader():
             return 
 
         t0 = time.time()
-        a, b = 0, 0
+        N = 2**8
         while True:
-            a, b = self.s.read(1), self.s.read(1)
-            t = time.time() - t0
-            q.put((t, ord(a), ord(b)))
-            if self.debug:
-                self.temp.append((t, ord(a), ord(b)))
-                self.plot()
+            t0 = time.time()
+            data = self.s.read(2*N)
+            t1 = time.time()
+            data = [ord(x) for x in struct.unpack('c'*2*N, data)]
+            dt = (t1 - t0)/N
+            for i in range(N):
+                t, a, b = t0+i*dt, data[2*i], data[2*i+1]
+                q.put((t, a, b))
+                if self.debug:
+                    self.temp.append((t, ord(a), ord(b)))
+                    self.plot()
             if done == 1:
                 logger.info( 'STOP acquiring data.' )
                 break
