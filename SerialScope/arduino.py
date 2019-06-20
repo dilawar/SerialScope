@@ -39,7 +39,7 @@ class SerialReader():
             t = time.time() - t0
             a, b = (1+math.sin(2*math.pi*100*t))*128, (1+math.cos(2*math.pi*50*t))*128
             q.put((t, a, b))
-            self.temp.append((t,a,b))
+            self.temp.append((1000*t,a,b))
             if done.value == 1:
                 logger.info( 'STOP acquiring data.' )
                 break
@@ -56,16 +56,16 @@ class SerialReader():
             logger.warning( "Arduino is not connected.")
             return 
 
-        t0 = time.time()
+        startT = time.time()
         N = 2**8
         while True:
             t0 = time.time()
             data = self.s.read(2*N)
-            t1 = time.time()
+            t1 = time.time() 
             data = [ord(x) for x in struct.unpack('c'*2*N, data)]
             dt = (t1 - t0)/N
             for i in range(N):
-                t, a, b = t0+i*dt, data[2*i], data[2*i+1]
+                t, a, b = 1000*(startT+i*dt), data[2*i], data[2*i+1]
                 q.put((t, a, b))
             if done == 1:
                 logger.info( 'STOP acquiring data.' )

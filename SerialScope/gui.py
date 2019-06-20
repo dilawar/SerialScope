@@ -82,6 +82,11 @@ class Channel():
             color=self.color)
         self.lines.append(l)
 
+    def clear(self):
+        for l in self.lines:
+            self.canvas().delete(l)
+        self.lines.clear()
+
     def changeResolutionXAxis(self, v):
         # changing x-axis resolution.
         self.xScale = 10.0/max(0.1, v)
@@ -99,26 +104,16 @@ class Channel():
         Add value to channel, draw it and update the canvas.
         Make sure to delete old lines when we roll-over to next frame.
         """
-        self.nData += 1
-        t0, y0 = self.prev
-        t1 = t1 % (C.T_/self.xScale)
-        self.curr = t1, y1
-        if t0 >= t1:
-            # This is NOT obvious. But when freeze is set True by a key-press, we wait
-            # till maximum time for which we can plot in the screen is passed. Then
-            # we freeze. Note that moving this logic to end of this block will
-            # defeat the purpose. If you doubt me; just move the following two lines
-            # around.
-            if self.freeze:
-                return
-            for l in self.lines:
-                self.canvas().delete(l)
-            self.lines.clear()
-            self.prev = (t1, y1)
-            return
-
         self.draw_value()
         self.prev = self.curr
+
+    def drawLine(self, x0, y0, x1, y1):
+        l = self.graph.DrawLine(
+                (x0*self.xScale, self.offset + y0 * self.yScale)
+                , (x1*self.xScale, self.offset + y1 * self.yScale)
+                , color = self.color
+                )
+        self.lines.append(l)
 
 class ScopeGUI():
     """
@@ -145,11 +140,11 @@ class ScopeGUI():
         self.gridLines = []
         self.gridColor = kwargs.get('grid_color', 'gray25')
         self.annotationColor = kwargs.get('annotation_color', 'gray')
-        self.nDataPerFrames = self.range(0) * self.FS
+        self.nDataPerFrames = self.getRange(0) * self.FS
         self.annotation = []
         self.draw_grid()
 
-    def range(self, which):
+    def getRange(self, which):
         assert which in [0, 1]
         return self.topRight[which] - self.bottomLeft[which]
 
@@ -214,17 +209,31 @@ class ScopeGUI():
         while q.qsize() > 1:
             t1, a1, b1 = q.get()
             # Time is in second here.
+            self.prev = self.curr
             self.curr = t1, a1, b1
-            t0 = self.prev[0]
-            self.FS = (1.0/(t1 - t0) + self.N * self.FS)/(self.N+1)
+            t0, a0, b0 = self.prev
+            self.FS = (1000.0/(t1 - t0) + self.N * self.FS)/(self.N+1)
             self.N += 1
             # These values are in ms.
-            self.channels["A"].add_value(1000*t1, a1)
-            self.channels["B"].add_value(1000*t1, b1)
-            self.prev = self.curr
+            t1 = t1 % C.T_
+            print( t0, t1, a0, a1, b0, b1 )
+            self.channels["A"].drawLine(t0, a0, t1, a1)
+            self.channels["B"].drawLine(t0, b0, t1, b1)
+            if t0 >= t1:
+                # This is NOT obvious. But when freeze is set True by a key-press, we wait
+                # till maximum time for which we can plot in the screen is passed. Then
+                # we freeze. Note that moving this logic to end of this block will
+                # defeat the purpose. If you doubt me; just move the following two lines
+                # around.
+                if self.freeze:
+                    continue
+                # delete both channels.
+                [ self.channels[x].clear() for x in self.channels]
+                break
 
         info=f"SR:{self.FS/1000.0:.1f} kHz"
-        info += f'\nSize: {q.qsize()}'
+        info += f'| Size: {q.qsize()}'
+        print( info )
         self.window.FindElement("INFO").Update(value=info)
         self.canvas().update()
 
