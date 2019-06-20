@@ -6,16 +6,15 @@ with open("README.md") as f:
     readme = f.read()
 
 setup(
-    name = "ArduinoScope",
+    name = "SerialScope",
     version = "0.0.1",
-    description = "A oscilloscope for using arduino board.",
+    description = "A serial-port based oscilloscope",
     long_description = readme,
-    #  packages = ["ArduinoScope" ],
     packages = find_packages(),
     package_data = {},
     install_requires = [ ],
     author = "Dilawar Singh",
     author_email = "dilawars@ncbs.res.in",
-    url = "http://github.com/dilawar/ArduinoScope",
+    url = "http://github.com/dilawar/SerialScope",
     license='GPL',
 )
