@@ -56,6 +56,8 @@ class Scope(gui.ScopeGUI):
         elif event.lower() == 'graph':
             # handle graph events.
             self.handleMouseEvent(event, values[event])
+        elif event.lower() == "clear-annotations":
+            self.clearAllAnnotations()
         else:
             logger.warn( f"Event: Unsupported {event}/{values}" )
 
@@ -65,7 +67,6 @@ class Scope(gui.ScopeGUI):
             if self.done:
                 break
         self.window.Close()
-
 
 def collect_data(q, scope):
     # A threaded function. Its job is to collect data from Queue which is being

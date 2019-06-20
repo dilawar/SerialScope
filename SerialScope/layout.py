@@ -104,7 +104,9 @@ chBWidgets = sg.Frame('Channel B', [
 widgets = sg.Column([[xWidgets], [chAWidgets], [chBWidgets]], key="widgets")
 layout = [[graph, widgets],
           [sg.Submit('PAUSE', key='toggle_run'),
-           sg.Exit('Quit', key='quit')]]
+           sg.Button('Clear Annotations', key='clear-annotations'),
+           sg.Exit('Quit', key='quit')]
+          ]
 
 # We want it global. Otherwise garbage collected will destroy the images.
 images_ = {}

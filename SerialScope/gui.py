@@ -36,19 +36,14 @@ class Channel():
         self.axLine = None
         self.gridLines = []
         self.gridColor = kwargs.get('grid_color', 'gray25')
+        self.annotation = []
 
     def canvas(self):
         return self.graph.TKCanvas
 
     def draw_axis(self):
         # Horizontal axis.
-        yLoc = self.offset
-        if self.axLine is not None:
-            self.canvas().delete(self.axLine)
-        self.axLine = self.graph.DrawLine((self.xRange[0], yLoc),
-                                          (self.xRange[1], yLoc),
-                                          color=self.color)
-        return self.axLine
+        return 
 
     def draw_grid(self):
         """
@@ -133,7 +128,7 @@ class ScopeGUI():
     Helper class for Scope GUI.
     """
 
-    def __init__(self, window):
+    def __init__(self, window, **kwargs):
         self.window = window
         self.freezeChannels = False
         self.nFrame = 0
@@ -146,11 +141,38 @@ class ScopeGUI():
                                        color="cyan", offset=-255),
                              B=Channel(self.window.FindElement("graph"),
                                        color="yellow", offset=51))
-        self.nGrids = dict(x=20, y=10)
         self.bottomLeft = (0, -255)
         self.topRight = (C.T_, 255)
         self.rect = (self.bottomLeft, self.topRight)
-        self.init_channels()
+        self.gridLines = []
+        self.gridColor = kwargs.get('grid_color', 'gray25')
+        self.annotationColor = kwargs.get('annotation_color', 'gray')
+        self.annotation = []
+        self.draw_grid()
+
+    def draw_grid(self):
+        # delete old grid if any.
+        for l in self.gridLines:
+            self.canvas().delete(l)
+        self.gridLines.clear()
+
+        # draw new grid.
+        xs = arange(self.bottomLeft[0], self.topRight[0], 10)
+        for x in xs:
+            gl = self.graph().DrawLine(
+                    (x, self.bottomLeft[1]), (x, self.topRight[1])
+                    , color=self.gridColor
+                    )
+            self.gridLines.append(gl)
+
+        # draw y grid. 1 section == 1 volt.
+        dy = 255//5
+        ys = arange(self.bottomLeft[1], self.topRight[1]+dy, dy)
+        for y in ys:
+            gl = self.graph().DrawLine(
+                    (self.bottomLeft[0], y), (self.topRight[1], y),
+                    color=self.gridColor)
+            self.gridLines.append(gl)
         self.canvas().config(cursor='cross')
 
     def freeze(self, channel=None):
@@ -166,14 +188,6 @@ class ScopeGUI():
                 self.channels[c].freeze = False
         else:
             self.channels[channel].freeze = False
-
-    def init_channels(self):
-        for c in self.channels:
-            ch = self.channels[c]
-            ax = ch.draw_axis()
-            self.elems['channel.axis'].append(ax)
-            grid = ch.draw_grid()
-            self.elems['channel.grid'].append(grid)
 
     def graph(self):
         return self.window.FindElement("graph")
@@ -206,8 +220,31 @@ class ScopeGUI():
     def changeOffsetChannel(self, v, channelName):
         self.channels[channelName].changeOffsetChannel(v)
 
+    def createAnnotation(self, evName, evValue):
+        x, y = evValue
+        if x is None or y is None:
+            return
+        vL = self.graph().DrawLine( 
+                (x, self.bottomLeft[1]), (x, self.topRight[1])
+                , color = self.annotationColor
+                )
+        hL = self.graph().DrawLine( 
+                (self.bottomLeft[0], y), (self.topRight[0], y)
+                , color = self.annotationColor
+                )
+        T, V = x, y * 5 / 255.0
+        annText = f"{T} ms/{V:.2f}"
+        t = self.graph().DrawText(annText, (x,y+8), color='white'
+                , font='Helvetica 8')
+        self.annotation.append((t, vL, hL))
+
+
     def handleMouseEvent(self, event, value):
-        print(f"Event {event} with value {value}")
-        self.canvas().config(cursor='plus')
+        # draw a line and label at this point. Press escape to clear them.
+        self.createAnnotation(event, value)
 
-
+    def clearAllAnnotations(self):
+        for (l1, l2, t) in self.annotation:
+            self.canvas().delete(l1)
+            self.canvas().delete(l2)
+            self.canvas().delete(t)
