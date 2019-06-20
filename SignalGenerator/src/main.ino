@@ -193,7 +193,6 @@ void setup()
     pinMode(A0, INPUT);
     pinMode(A1, INPUT);
 
-    pinMode(8, OUTPUT);
     tone(8, 100);
 }
 

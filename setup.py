@@ -10,6 +10,7 @@ setup(
     version = "0.0.1",
     description = "A serial-port based oscilloscope",
     long_description = readme,
+    long_description_content_type='text/markdown',
     packages = find_packages(),
     package_data = {},
     install_requires = [ ],
