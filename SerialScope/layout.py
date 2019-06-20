@@ -12,15 +12,15 @@ import PySimpleGUI as sg
 
 from SerialScope import config
 
-W = config.w_
-H = config.h_
+W = config.w_ / 1.25
+H = config.h_ / 1.1
 
 maxX = config.rangeX_[1]
 maxY = config.rangeY_[1]
 nFrames = 0
 
 # Two graphs. One for channel 1 and other for channel 2.
-graph = sg.Graph(canvas_size=(W * 2 // 3, 2 * H // 3),
+graph = sg.Graph(canvas_size=(W, H),
                  graph_bottom_left=(0, -maxY),
                  graph_top_right=(maxX, maxY),
                  background_color='black',
@@ -67,7 +67,7 @@ chAWidgets = sg.Frame('Channel A', [
                   orientation='h',
                   size=sliderSize_,
                   enable_events=True,
-                  default_value=-5,
+                  default_value=0,
                   resolution=0.1,
                   tick_interval=2,
                   key="channel-a-offset")
@@ -93,15 +93,19 @@ chBWidgets = sg.Frame('Channel B', [
                   orientation='h',
                   size=sliderSize_,
                   enable_events=True,
-                  default_value=1.0,
+                  default_value=0,
                   resolution=0.1,
                   tick_interval=2.0,
                   key="channel-b-offset")
     ],
 ])
 
+info = sg.Text( "Sampling Rate", key = "FS")
+
 # Constuct layout.
-widgets = sg.Column([[xWidgets], [chAWidgets], [chBWidgets]], key="widgets")
+widgets = sg.Column([
+    [xWidgets], [chAWidgets], [chBWidgets], [info]
+    ], key="widgets")
 layout = [[graph, widgets],
           [sg.Submit('PAUSE', key='toggle_run'),
            sg.Button('Clear Annotations', key='clear-annotations'),

@@ -119,9 +119,6 @@ class Channel():
 
         self.draw_value()
         self.prev = self.curr
-        if self.nData % 100 == 0:
-            self.canvas().update()
-
 
 class ScopeGUI():
     """
@@ -132,23 +129,29 @@ class ScopeGUI():
         self.window = window
         self.freezeChannels = False
         self.nFrame = 0
-        self.nData = 0
+        self.FS = 0                     # at what rate sample are coming in.
+        self.N = 0
         self.prev = 0.0, 0.0, 0.0
         self.curr = self.prev
         self.elems = defaultdict(list)
         self.colos = {'chanA.line': 'cyan', 'chanB.line': 'white'}
         self.channels = dict(A=Channel(self.window.FindElement("graph"),
-                                       color="cyan", offset=-255),
+                                       color="cyan", offset=0),
                              B=Channel(self.window.FindElement("graph"),
-                                       color="yellow", offset=51))
+                                       color="yellow", offset=0))
         self.bottomLeft = (0, -255)
         self.topRight = (C.T_, 255)
         self.rect = (self.bottomLeft, self.topRight)
         self.gridLines = []
         self.gridColor = kwargs.get('grid_color', 'gray25')
         self.annotationColor = kwargs.get('annotation_color', 'gray')
+        self.nDataPerFrames = self.range(0) * self.FS
         self.annotation = []
         self.draw_grid()
+
+    def range(self, which):
+        assert which in [0, 1]
+        return self.topRight[which] - self.bottomLeft[which]
 
     def draw_grid(self):
         # delete old grid if any.
@@ -162,6 +165,7 @@ class ScopeGUI():
             gl = self.graph().DrawLine(
                     (x, self.bottomLeft[1]), (x, self.topRight[1])
                     , color=self.gridColor
+                    , width = 2
                     )
             self.gridLines.append(gl)
 
@@ -170,8 +174,10 @@ class ScopeGUI():
         ys = arange(self.bottomLeft[1], self.topRight[1]+dy, dy)
         for y in ys:
             gl = self.graph().DrawLine(
-                    (self.bottomLeft[0], y), (self.topRight[1], y),
-                    color=self.gridColor)
+                    (self.bottomLeft[0], y), (self.topRight[1], y)
+                    , color=self.gridColor
+                    , width = 2
+                    )
             self.gridLines.append(gl)
         self.canvas().config(cursor='cross')
 
@@ -205,9 +211,21 @@ class ScopeGUI():
             self.channels[ch].draw_axis()
 
     def add_values(self, t1, a1, b1):
-        # Time is in ms.
+        # Time is in second here.
+        self.curr = t1, a1, b1
+        t0 = self.prev[0]
+        self.FS = (1.0/(t1 - t0) + self.N * self.FS)/(self.N+1)
+        self.N += 1
+
+        # These values are in ms.
         self.channels["A"].add_value(1000*t1, a1)
         self.channels["B"].add_value(1000*t1, b1)
+        self.prev = self.curr
+        if self.N % 100:
+            self.canvas().update()
+            self.window.FindElement("FS").Update( 
+                    value=f"SR:{self.FS/1000.0:.1f} kHz"
+                    )
 
     def changeResolutionXAxis(self, v):
         logger.info(f"Updating x-resolution to {v}")
