@@ -1,1 +1,1 @@
-An oscilloscope based on Arduino Uno board (__Work in progress__)
+A serial port oscilloscope. 
