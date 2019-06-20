@@ -6,11 +6,16 @@ A serial port oscilloscope.
 
 # Install
 
-    $ pip install SerialScope --user 
+    $ pip install SerialScope --user    # just for you
+or,
 
-After installation, launch it by following command,
+    $ sudo -E pip install SerialScope   # for all users
+
+After installation, launch it. 
 
     $ serialscope
+
+Path `~/.local/bin` should be in your `PATH` environment variable.
 
 The default baud rate are serial port is `115200` and  `/dev/ttyACM0`
 respectively. You can change these values from command line
@@ -27,6 +32,12 @@ optional arguments:
                         Baudrate of Arduino board.
 
 ```
+
+## Dependencies
+
+- pyserial
+- pysimplegui
+- screeninfo (optional)
 
 # How it works
 
