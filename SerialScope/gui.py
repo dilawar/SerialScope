@@ -97,6 +97,7 @@ class Channel():
         logger.info(f"Channel offset to {v} volt.")
         # This is in volt. Change to pixels. Divide by resolution.
         self.offset = v / self.resolution
+        self.draw_grid()
 
     def add_value(self, t1, y1):
         """
@@ -142,9 +143,9 @@ class ScopeGUI():
         self.elems = defaultdict(list)
         self.colos = {'chanA.line': 'cyan', 'chanB.line': 'white'}
         self.channels = dict(A=Channel(self.window.FindElement("graph"),
-                                       color="cyan", offset=-255),
+                                       color="cyan"),
                              B=Channel(self.window.FindElement("graph"),
-                                       color="yellow", offset=51))
+                                       color="yellow"))
         self.nGrids = dict(x=20, y=10)
         self.bottomLeft = (0, -255)
         self.topRight = (C.T_, 255)
