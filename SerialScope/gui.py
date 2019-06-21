@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-__author__ = "Dilawar Singh"
-__copyright__ = "Copyright 2019-, Dilawar Singh"
+__author__     = "Dilawar Singh"
+__copyright__  = "Copyright 2019-, Dilawar Singh"
 __maintainer__ = "Dilawar Singh"
-__email__ = "dilawars@ncbs.res.in"
+__email__      = "dilawars@ncbs.res.in"
 
 from collections import defaultdict
 from SerialScope import config as C
@@ -188,9 +188,10 @@ class ScopeGUI():
         for ch in self.channels:
             self.channels[ch].draw_axis()
 
-    def add_values(self, t1, a1, b1):
-        self.channels["A"].add_value(t1, a1)
-        self.channels["B"].add_value(t1, b1)
+    def add_values(self, data):
+        for t1, a1, b1 in data:
+            self.channels["A"].add_value(t1, a1)
+            self.channels["B"].add_value(t1, b1)
 
     def changeResolutionXAxis(self, v):
         logger.info(f"Updating x-resolution to {v}")
