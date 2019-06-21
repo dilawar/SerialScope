@@ -7,8 +7,8 @@ __maintainer__       = "Dilawar Singh"
 __email__            = "dilawars@ncbs.res.in"
 __status__           = "Development"
 
-import multiprocessing as mp
 import threading
+import collections
 
 from SerialScope import arduino
 from SerialScope import layout 
@@ -70,15 +70,16 @@ def collect_data(q, scope):
     # filled by Arduino client and send those values to ScopeGUI. May be we can
     # let the ArduinoClient directly send values to ScopeGUI?
     while True:
-        scope.add_values(*q.get())
+        if q:
+            scope.add_values(*q.pop())
 
 def main(args):
     # Launch arduino reader.
-    arduinoQ = mp.Queue()
-    clientDone = mp.Value('d', 0)
+    arduinoQ = collections.deque([], maxlen=1000)
+    clientDone = 0
     arduinoClient = arduino.SerialReader(args.port, args.baudrate)
-    arduinoP = mp.Process(target=arduinoClient.run, args=(arduinoQ, clientDone))
-    #  arduinoP = mp.Process(target=arduinoClient.run_without_arduino, args=(arduinoQ, clientDone))
+    #arduinoP = threading.Thread(target=arduinoClient.run, args=(arduinoQ, clientDone))
+    arduinoP = threading.Thread(target=arduinoClient.run_without_arduino, args=(arduinoQ, clientDone))
     arduinoP.daemon = True
     arduinoP.start()
 
