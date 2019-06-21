@@ -12,7 +12,7 @@ import serial
 import time
 import threading
 import math
-import collections
+import queue
 import struct
 
 import logging
@@ -39,7 +39,7 @@ class SerialReader():
             #  a, b = random.randint(0, 256), random.randint(0, 256)
             t = time.time() - t0
             a, b = (1+math.sin(2*math.pi*100*t))*128, (1+math.cos(2*math.pi*50*t))*128
-            q.append((t, a, b))
+            q.put((t, a, b))
             time.sleep(0.0001)
             if done == 1:
                 logger.info( 'STOP acquiring data.' )
@@ -67,7 +67,7 @@ class SerialReader():
             dt = (t1 - t0)/N
             for i in range(N):
                 t, a, b = t0+i*dt, data[2*i], data[2*i+1]
-                q.append((t, a, b))
+                q.put((t, a, b))
             if done == 1:
                 logger.info( 'STOP acquiring data.' )
                 break
@@ -85,14 +85,14 @@ def pygnuplot(q):
 
 def test():
     s = SerialReader( '/dev/ttyACM0', 115200, debug=True)
-    q = collections.deque()
+    q = queue.Queue()
     done = 0
-    t = threading.Thread( target=s.run,  args=(q, done))
+    t = threading.Thread( target=s.run_without_arduino,  args=(q, done))
     t.daemon = True
     t.start()
-    time.sleep(200 )
+    time.sleep(10)
     done = 1
-    print(f"Total {len(q)} in 10 seconds.")
+    print(f"Total {q.qsize()} in 10 seconds.")
 
 if __name__ == '__main__':
     test()

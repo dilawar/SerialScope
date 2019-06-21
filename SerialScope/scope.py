@@ -8,7 +8,7 @@ __email__            = "dilawars@ncbs.res.in"
 __status__           = "Development"
 
 import threading
-import collections
+import queue
 
 from SerialScope import arduino
 from SerialScope import layout 
@@ -70,12 +70,12 @@ def collect_data(q, scope):
     # filled by Arduino client and send those values to ScopeGUI. May be we can
     # let the ArduinoClient directly send values to ScopeGUI?
     while True:
-        if q:
-            scope.add_values(*q.pop())
+        scope.add_values([q.get()])
+        #  print( len(data) )
 
 def main(args):
     # Launch arduino reader.
-    arduinoQ = collections.deque([], maxlen=1000)
+    arduinoQ = queue.Queue()
     clientDone = 0
     arduinoClient = arduino.SerialReader(args.port, args.baudrate)
     #arduinoP = threading.Thread(target=arduinoClient.run, args=(arduinoQ, clientDone))
