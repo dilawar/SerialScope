@@ -14,6 +14,10 @@ def arange(minV, maxV, step):
     vals = [ minV + i*step for i in range(0, int((maxV - minV)/step))]
     return vals
 
+def linspace(minV, maxV, n):
+    step = (maxV - minV)/n
+    return arange(minV, maxV, step)
+
 class Channel():
     """
     Class for handling channel.
@@ -37,6 +41,7 @@ class Channel():
         self.gridLines = []
         self.gridColor = kwargs.get('grid_color', 'gray25')
 
+    @property
     def canvas(self):
         return self.graph.TKCanvas
 
@@ -44,7 +49,7 @@ class Channel():
         # Horizontal axis.
         yLoc = self.offset
         if self.axLine is not None:
-            self.canvas().delete(self.axLine)
+            self.canvas.delete(self.axLine)
         self.axLine = self.graph.DrawLine((self.xRange[0], yLoc),
                                           (self.xRange[1], yLoc),
                                           color=self.color)
@@ -57,7 +62,7 @@ class Channel():
 
         # delete old grid if any.
         for l in self.gridLines:
-            self.canvas().delete(l)
+            self.canvas.delete(l)
         self.gridLines.clear()
 
         # draw new grid.
@@ -97,7 +102,7 @@ class Channel():
         logger.info(f"Channel offset to {v} volt.")
         # This is in volt. Change to pixels. Divide by resolution.
         self.offset = v / self.resolution
-        self.draw_grid()
+        #  self.draw_grid()
 
     def add_value(self, t1, y1):
         """
@@ -117,7 +122,7 @@ class Channel():
             if self.freeze:
                 return
             for l in self.lines:
-                self.canvas().delete(l)
+                self.canvas.delete(l)
             self.lines.clear()
             self.prev = (t1, y1)
             return
@@ -125,7 +130,7 @@ class Channel():
         self.draw_value()
         self.prev = self.curr
         if self.nData % 100 == 0:
-            self.canvas().update()
+            self.canvas.update()
 
 
 class ScopeGUI():
@@ -149,8 +154,13 @@ class ScopeGUI():
         self.nGrids = dict(x=20, y=10)
         self.bottomLeft = (0, -255)
         self.topRight = (C.T_, 255)
+        self.gridSize = self.getRange(0)/20, self.getRange(1)/10
         self.rect = (self.bottomLeft, self.topRight)
-        self.init_channels()
+        self.gridLines = []
+        self.drawGrid()
+
+    def getRange(self, dim):
+        return self.topRight[dim] - self.bottomLeft[dim]
 
     def freeze(self, channel=None):
         if channel is None:
@@ -174,11 +184,27 @@ class ScopeGUI():
             grid = ch.draw_grid()
             self.elems['channel.grid'].append(grid)
 
+    @property
     def graph(self):
         return self.window.FindElement("graph")
 
+    def drawGrid(self):
+        # draw new grid.
+        gridColor = 'gray25'
+        xs = linspace(self.bottomLeft[0], self.topRight[0], 20)
+        for x in xs:
+            gl = self.graph.DrawLine((x, self.bottomLeft[1]), (x, self.topRight[1]), gridColor)
+            self.gridLines.append(gl)
+
+        # draw y grid. 1 section == 1 volt.
+        ys = linspace(self.bottomLeft[1], self.topRight[1], 10)
+        for y in ys:
+            gl = self.graph.DrawLine((self.bottomLeft[0], y), (self.topRight[1], y), color=gridColor)
+            self.gridLines.append(gl)
+
+    @property
     def canvas(self):
-        return self.graph().TkCanvas
+        return self.graph.TkCanvas
 
     def attach_label(self):
         if 'label' in self.elems:
