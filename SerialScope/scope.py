@@ -8,13 +8,14 @@ __email__            = "dilawars@ncbs.res.in"
 __status__           = "Development"
 
 import threading
-import queue
+import collections
 
 from SerialScope import arduino
 from SerialScope import layout 
 from SerialScope import gui 
-from SerialScope.config import logger
+import SerialScope.config as C
 
+logger = C.logger
 
 class Scope(gui.ScopeGUI):
     """
@@ -73,15 +74,15 @@ class Scope(gui.ScopeGUI):
         self.window.Close()
 
 
-def collect_data(q, scope):
+def collect_data(scope):
     # A threaded function. Its job is to collect data from Queue which is being
     # filled by Arduino client and send those values to ScopeGUI. May be we can
     # let the ArduinoClient directly send values to ScopeGUI?
     while True:
         data = []
-        #  while q.qsize() > 0 and len(data) < 10:
-            #  data.append(q.get())
-        scope.add_values([q.get()])
+        while C.Q_:
+            data.append(C.Q_.popleft())
+        scope.add_values(data) if data else None
 
 def changeDevice(devname, scope):
     logger.info( f"Chaning device to {devname}")
@@ -89,10 +90,9 @@ def changeDevice(devname, scope):
 
 def main(args):
     # Launch arduino reader.
-    arduinoQ = queue.Queue(maxsize=1000)
     clientDone = 0
     arduinoClient = arduino.SerialReader(layout.defaultDevice(), args.baudrate)
-    arduinoP = threading.Thread(target=arduinoClient.run, args=(arduinoQ, clientDone))
+    arduinoP = threading.Thread(target=arduinoClient.run, args=(clientDone,))
     arduinoP.daemon = True
     arduinoP.start()
 
@@ -101,7 +101,7 @@ def main(args):
 
     # This can not be a multiprocessing Process since XinitThreads. Use it in
     # main process with timeout.
-    scopeP = threading.Thread(target=collect_data, args=(arduinoQ, scope))
+    scopeP = threading.Thread(target=collect_data, args=(scope,))
     scopeP.daemon = True
     scopeP.start()
 
