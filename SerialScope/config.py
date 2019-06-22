@@ -8,6 +8,11 @@ __email__            = "dilawars@ncbs.res.in"
 __status__           = "Development"
 
 import logging
+
+import serial.tools.list_ports
+ports_ = list(serial.tools.list_ports.comports())
+
+
 logging.basicConfig(level=logging.DEBUG,
     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
     )
