@@ -8,15 +8,17 @@ __email__            = "dilawars@ncbs.res.in"
 __status__           = "Development"
 
 import logging
-
 import serial.tools.list_ports
-ports_ = list(serial.tools.list_ports.comports())
 
 
 logging.basicConfig(level=logging.DEBUG,
     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
     )
 logger = logging.getLogger('scope')
+
+# Find ports and log their value.
+ports_ = [str(x) for x in serial.tools.list_ports.comports()]
+logging.debug( f"Found ports {ports_}" )
 
 # set resolution.
 w_, h_ = 1200, 900
@@ -25,7 +27,7 @@ try:
     m = get_monitors()[0]
     w_, h_ = int(m.width//1.2), int(m.height//1.2)
 except Exception as e:
-    logger.warn( "module screeninfo is not available: %s"%e)
+    logger.warning( "module screeninfo is not available: %s"%e)
     pass
 
 def log(msg, level=1):
