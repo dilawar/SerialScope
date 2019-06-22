@@ -8,7 +8,7 @@ with open("README.md") as f:
 
 setup(
     name = "SerialScope",
-    version = "0.0.6",
+    version = "0.0.7",
     description = "A serial-port based oscilloscope",
     long_description = readme,
     long_description_content_type='text/markdown',
