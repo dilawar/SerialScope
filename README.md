@@ -76,6 +76,7 @@ void write_data_line( )
 
 # CHANGELOG
 
+- v0.0.7: More bug fixes. GUI can't keep up with fast serial port. 
 - v0.0.6: Bug fix.
 - v0.0.5: Fixed the annotation labels.
 - v0.0.4: Freeze and annotate the trajectories. Default internal device. Select
