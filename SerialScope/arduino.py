@@ -13,8 +13,9 @@ import time
 import os
 import threading
 import math
-import queue
+import collections
 import struct
+import SerialScope.config as C
 
 import logging
 logger = logging.getLogger("arduino")
@@ -58,20 +59,20 @@ class SerialReader():
             data = [ord(x) for x in struct.unpack('c'*N, data)]
             return data
 
-    def run(self, q, done):
+    def run(self, done):
         # Keep runing and put data in q. 
         t0 = time.time()
-        N = 2**12
+        N = 2**8
         while True:
-            #  self.lock.acquire()
+            self.lock.acquire()
             t0 = time.time()
             data = self.Read(2*N)
             t1 = time.time()
             dt = (t1 - t0)/N
             for i in range(N):
                 t, a, b = t0+i*dt, data[2*i], data[2*i+1]
-                q.put((t, a, b))
-            #  self.lock.release()
+                C.Q_.append((t, a, b))
+            self.lock.release()
             if done == 1:
                 logger.info( 'STOP acquiring data.' )
                 break
@@ -97,20 +98,16 @@ class SerialReader():
         logger.info( f"Calling close." )
         self.s.close()
 
-def pygnuplot(q):
-    print( "Plotting" )
-
 def test():
     import sys
     s = SerialReader( sys.argv[1], 115200, debug=True)
-    q = queue.Queue()
     done = 0
-    t = threading.Thread( target=s.run,  args=(q, done))
+    t = threading.Thread( target=s.run,  args=(done,))
     t.daemon = True
     t.start()
     time.sleep(10)
     done = 1
-    print(f"Total {q.qsize()} in 1 seconds.")
+    print(f"Total {len(C.Q_)} in 1 seconds.")
 
 if __name__ == '__main__':
     test()

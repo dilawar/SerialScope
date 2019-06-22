@@ -8,12 +8,15 @@ __email__ = "dilawars@ncbs.res.in"
 __status__ = "Development"
 
 import logging
+import collections
 import serial.tools.list_ports
 
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
 logger = logging.getLogger('scope')
+
+Q_ = collections.deque([], 1000)
 
 # Find ports and log their value.
 ports_ = [
