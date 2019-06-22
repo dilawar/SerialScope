@@ -19,7 +19,6 @@ import struct
 import logging
 logger = logging.getLogger("arduino")
 
-
 class SerialReader():
     """docstring for SerialReader"""
     def __init__(self, port, baud, debug = False):
@@ -29,53 +28,50 @@ class SerialReader():
         self.s = None
         self.temp = []
         self.debug = debug
-        self.devname = "internal"
+        self.devname = ''
         self.lock = threading.Lock()
         try:
             self.s = serial.Serial(port, baud)
-        except Exception:
-            pass
+        except Exception as e:
+            print(e)
         self.done = False
 
-    def run_without_arduino(self, q, done):
-        t0 = time.time()
-        while True:
-            #  a, b = random.randint(0, 256), random.randint(0, 256)
-            t = time.time() - t0
-            a, b = (1+math.sin(2*math.pi*100*t))*128, (1+math.cos(2*math.pi*50*t))*128
-            q.put((t, a, b))
+    def isInternal(self):
+        if self.s is None:
+            return True
+        elif self.devname.lower() == 'internal':
+            return True
+        return False
+
+    def Read(self, N):
+        if self.isInternal():
+            data = []
+            t = time.time()
+            for i in range(N//2):
+                a, b = (1+math.sin(2*math.pi*100*t))*128, (1+math.cos(2*math.pi*50*t))*128
+                data += [int(a), int(b)]
             time.sleep(0.0001)
-            if done == 1:
-                logger.info( 'STOP acquiring data.' )
-                break
-        self.done = True
-        self.close()
-        q.close()
-        return True
+            assert len(data) == N
+            return data
+        else:
+            data = self.s.read(N)
+            data = [ord(x) for x in struct.unpack('c'*N, data)]
+            return data
 
     def run(self, q, done):
         # Keep runing and put data in q. 
-        if self.devname == "internal":
-            self.run_without_arduino(q, done)
-            return True
-
-        if not self.s:
-            logger.warning( "Arduino is not connected.")
-            return 
-
         t0 = time.time()
-        N = 2**8
+        N = 2**12
         while True:
-            self.lock.acquire()
+            #  self.lock.acquire()
             t0 = time.time()
-            data = self.s.read(2*N)
+            data = self.Read(2*N)
             t1 = time.time()
-            data = [ord(x) for x in struct.unpack('c'*2*N, data)]
             dt = (t1 - t0)/N
             for i in range(N):
                 t, a, b = t0+i*dt, data[2*i], data[2*i+1]
                 q.put((t, a, b))
-            self.lock.release
+            #  self.lock.release()
             if done == 1:
                 logger.info( 'STOP acquiring data.' )
                 break
@@ -105,15 +101,16 @@ def pygnuplot(q):
     print( "Plotting" )
 
 def test():
-    s = SerialReader( '/dev/ttyACM0', 115200, debug=True)
+    import sys
+    s = SerialReader( sys.argv[1], 115200, debug=True)
     q = queue.Queue()
     done = 0
-    t = threading.Thread( target=s.run_without_arduino,  args=(q, done))
+    t = threading.Thread( target=s.run,  args=(q, done))
     t.daemon = True
     t.start()
     time.sleep(10)
     done = 1
-    print(f"Total {q.qsize()} in 10 seconds.")
+    print(f"Total {q.qsize()} in 1 seconds.")
 
 if __name__ == '__main__':
     test()

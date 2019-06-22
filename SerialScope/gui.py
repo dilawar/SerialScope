@@ -19,7 +19,6 @@ def linspace(minV, maxV, n):
     step = (maxV - minV) / n
     return arange(minV, maxV, step)
 
-
 class Channel():
     """
     Class for handling channel.
@@ -132,7 +131,7 @@ class Channel():
 
         self.draw_value()
         self.prev = self.curr
-        if self.nData % 100 == 0:
+        if self.nData % 1000 == 0:
             self.canvas.update()
 
 

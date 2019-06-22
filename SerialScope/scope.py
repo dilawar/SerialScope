@@ -78,7 +78,11 @@ def collect_data(q, scope):
     # filled by Arduino client and send those values to ScopeGUI. May be we can
     # let the ArduinoClient directly send values to ScopeGUI?
     while True:
-        scope.add_values([q.get()])
+        data = []
+        while q.qsize() > 0 and len(data) < 100:
+            data.append(q.get())
+        print( q.qsize() )
+        scope.add_values(data)
 
 def changeDevice(devname, scope):
     logger.info( f"Chaning device to {devname}")
@@ -86,9 +90,9 @@ def changeDevice(devname, scope):
 
 def main(args):
     # Launch arduino reader.
-    arduinoQ = queue.Queue()
+    arduinoQ = queue.Queue(maxsize=1000)
     clientDone = 0
-    arduinoClient = arduino.SerialReader(args.port, args.baudrate)
+    arduinoClient = arduino.SerialReader(layout.defaultDevice(), args.baudrate)
     arduinoP = threading.Thread(target=arduinoClient.run, args=(arduinoQ, clientDone))
     arduinoP.daemon = True
     arduinoP.start()
