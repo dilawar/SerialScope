@@ -10,6 +10,7 @@ __status__           = "Development"
 
 import serial
 import time
+import os
 import threading
 import math
 import queue
@@ -17,6 +18,7 @@ import struct
 
 import logging
 logger = logging.getLogger("arduino")
+
 
 class SerialReader():
     """docstring for SerialReader"""
@@ -27,6 +29,8 @@ class SerialReader():
         self.s = None
         self.temp = []
         self.debug = debug
+        self.devname = "internal"
+        self.lock = threading.Lock()
         try:
             self.s = serial.Serial(port, baud)
         except Exception:
@@ -49,10 +53,12 @@ class SerialReader():
         q.close()
         return True
 
-
     def run(self, q, done):
         # Keep runing and put data in q. 
-        logger.info( f"Acquiring data from Arduino." )
+        if self.devname == "internal":
+            self.run_without_arduino(q, done)
+            return True
+
         if not self.s:
             logger.warning( "Arduino is not connected.")
             return 
@@ -60,6 +66,7 @@ class SerialReader():
         t0 = time.time()
         N = 2**8
         while True:
+            self.lock.acquire()
             t0 = time.time()
             data = self.s.read(2*N)
             t1 = time.time()
@@ -68,6 +75,7 @@ class SerialReader():
             for i in range(N):
                 t, a, b = t0+i*dt, data[2*i], data[2*i+1]
                 q.put((t, a, b))
+            self.lock.release
             if done == 1:
                 logger.info( 'STOP acquiring data.' )
                 break
@@ -75,6 +83,20 @@ class SerialReader():
         self.close()
         q.close()
         return True
+
+    def changeDevice(self, devname):
+        if isinstance(devname, list):
+            devname = devname[0]
+        if devname == self.devname:
+            return
+        self.lock.acquire()
+        print( f"[INFO ] Chaning devname to {devname}" )
+        self.devname = devname
+        if os.path.exists(self.devname):
+            self.s.close()
+            self.port = self.devname
+            self.s = serial.Serial(self.port, self.baud)
+        self.lock.release()
 
     def close(self):
         logger.info( f"Calling close." )

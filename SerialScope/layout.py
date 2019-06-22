@@ -1,3 +1,4 @@
+#
 # -*- coding: utf-8 -*-
 
 __author__ = "Dilawar Singh"
@@ -91,8 +92,17 @@ chBWidgets = sg.Frame('Channel B', [
     ],
 ])
 
+# Serial port
+devices = sg.Listbox(values=config.ports_ + ['internal'],
+                     size=(25, 3),
+                     key='DEVICE',
+                     default_values='internal',
+                     enable_events=True)
+serialWidgets = sg.Frame("Device", [[devices]])
+
 # Constuct layout.
-widgets = sg.Column([[xWidgets], [chAWidgets], [chBWidgets]], key="widgets")
+widgets = sg.Column([[xWidgets], [chAWidgets], [chBWidgets], [serialWidgets]],
+                    key="widgets")
 layout = [[graph, widgets],
           [
               sg.Submit('PAUSE', key='toggle_run'),

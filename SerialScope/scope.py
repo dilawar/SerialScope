@@ -20,9 +20,10 @@ class Scope(gui.ScopeGUI):
     """
     Main class for Scope.
     """
-    def __init__(self, window):
+    def __init__(self, window, arduino):
         gui.ScopeGUI.__init__(self, window)
         self.done = False
+        self.arduino = arduino
 
     def handleEvents(self):
         event, values = self.window.Read()
@@ -58,6 +59,8 @@ class Scope(gui.ScopeGUI):
             self.handleMouseEvent(event, values[event])
         elif event.lower() == "clear-annotations":
             self.clearAllAnnotations()
+        elif event.lower() == 'device':
+            self.arduino.changeDevice( values[event] )
         else:
             logger.info( f"Event: {event} and {values}")
             logger.warn( f'Unsupported event' )
@@ -76,20 +79,22 @@ def collect_data(q, scope):
     # let the ArduinoClient directly send values to ScopeGUI?
     while True:
         scope.add_values([q.get()])
-        #  print( len(data) )
+
+def changeDevice(devname, scope):
+    logger.info( f"Chaning device to {devname}")
+    scope.changeDevice(devname)
 
 def main(args):
     # Launch arduino reader.
     arduinoQ = queue.Queue()
     clientDone = 0
     arduinoClient = arduino.SerialReader(args.port, args.baudrate)
-    #arduinoP = threading.Thread(target=arduinoClient.run, args=(arduinoQ, clientDone))
-    arduinoP = threading.Thread(target=arduinoClient.run_without_arduino, args=(arduinoQ, clientDone))
+    arduinoP = threading.Thread(target=arduinoClient.run, args=(arduinoQ, clientDone))
     arduinoP.daemon = True
     arduinoP.start()
 
     # create a scope and share it with arduino client.
-    scope = Scope(layout.mainWindow)
+    scope = Scope(layout.mainWindow, arduinoClient)
 
     # This can not be a multiprocessing Process since XinitThreads. Use it in
     # main process with timeout.
