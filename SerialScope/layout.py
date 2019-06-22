@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 
 __author__ = "Dilawar Singh"
-__copyright__ = "Copyright 2017-, Dilawar Singh"
+__copyright__ = "Copyright 2019-, Dilawar Singh"
 __version__ = "1.0.0"
 __maintainer__ = "Dilawar Singh"
 __email__ = "dilawars@ncbs.res.in"
-__status__ = "Development"
 
 import SerialScope.PySimpleGUI as sg
 from SerialScope import config
-
 W = config.w_
 H = config.h_
 
@@ -18,17 +16,13 @@ maxY = config.rangeY_[1]
 nFrames = 0
 
 # Two graphs. One for channel 1 and other for channel 2.
-graph = sg.Graph(canvas_size=(W*2//3, 4*H/5),
+graph = sg.Graph(canvas_size=(W * 2 // 3, 4 * H / 5),
                  graph_bottom_left=(0, -maxY),
                  graph_top_right=(maxX, maxY),
+                 enable_events=True,
                  background_color='black',
                  float_values=True,
                  key='graph')
-
-#  currentTab = sg.Tab('Live', [[graph]])
-#  artifactTab = sg.Tab(
-    #  'Data', [],
-    #  [[sg.Canvas(size=(config.w_ * 2 // 3, config.h_), key='data')]])
 
 # parameters.
 labelSize_ = (6, 1)
@@ -100,10 +94,11 @@ chBWidgets = sg.Frame('Channel B', [
 # Constuct layout.
 widgets = sg.Column([[xWidgets], [chAWidgets], [chBWidgets]], key="widgets")
 layout = [[graph, widgets],
-        [sg.Submit('PAUSE', key='toggle_run'),
-            sg.Button('Clear Annotations', key='clear-annotations'),
-            sg.Exit('Quit', key='quit')]
-        ]
+          [
+              sg.Submit('PAUSE', key='toggle_run'),
+              sg.Button('Clear Annotations', key='clear-annotations'),
+              sg.Exit('Quit', key='quit')
+          ]]
 
 # We want it global. Otherwise garbage collected will destroy the images.
 images_ = {}

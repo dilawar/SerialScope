@@ -1,27 +1,30 @@
 # -*- coding: utf-8 -*-
 
-__author__     = "Dilawar Singh"
-__copyright__  = "Copyright 2019-, Dilawar Singh"
+__author__ = "Dilawar Singh"
+__copyright__ = "Copyright 2019-, Dilawar Singh"
 __maintainer__ = "Dilawar Singh"
-__email__      = "dilawars@ncbs.res.in"
+__email__ = "dilawars@ncbs.res.in"
 
 from collections import defaultdict
 from SerialScope import config as C
-
 logger = C.logger
 
+
 def arange(minV, maxV, step):
-    vals = [ minV + i*step for i in range(0, int((maxV - minV)/step))]
+    vals = [minV + i * step for i in range(0, int((maxV - minV) / step))]
     return vals
 
+
 def linspace(minV, maxV, n):
-    step = (maxV - minV)/n
+    step = (maxV - minV) / n
     return arange(minV, maxV, step)
+
 
 class Channel():
     """
     Class for handling channel.
     """
+
     def __init__(self, graph, **kwargs):
         self.graph = graph
         self.lines = []
@@ -74,10 +77,10 @@ class Channel():
             self.gridLines.append(gl)
 
         # draw y grid. 1 section == 1 volt.
-        ys = arange(self.yRange[0], self.yRange[1], 255/5)
+        ys = arange(self.yRange[0], self.yRange[1], 255 / 5)
         for y in ys:
-            gl = self.graph.DrawLine((self.xRange[0], self.offset+y),
-                                     (self.xRange[1], self.offset+y),
+            gl = self.graph.DrawLine((self.xRange[0], self.offset + y),
+                                     (self.xRange[1], self.offset + y),
                                      color=self.gridColor)
             self.gridLines.append(gl)
 
@@ -93,10 +96,10 @@ class Channel():
 
     def changeResolutionXAxis(self, v):
         # changing x-axis resolution.
-        self.xScale = 10.0/max(0.1, v)
+        self.xScale = 10.0 / max(0.1, v)
 
     def changeResolutionYAxis(self, v):
-        self.yScale = 1.0/max(0.01, v)
+        self.yScale = 1.0 / max(0.01, v)
 
     def changeOffsetChannel(self, v):
         logger.info(f"Channel offset to {v} volt.")
@@ -111,7 +114,7 @@ class Channel():
         """
         self.nData += 1
         t0, y0 = self.prev
-        t1 = t1 % (C.T_/self.xScale)
+        t1 = t1 % (C.T_ / self.xScale)
         self.curr = t1, y1
         if t0 >= t1:
             # This is NOT obvious. But when freeze is set True by a key-press, we wait
@@ -154,7 +157,7 @@ class ScopeGUI():
         self.nGrids = dict(x=20, y=10)
         self.bottomLeft = (0, -255)
         self.topRight = (C.T_, 255)
-        self.gridSize = self.getRange(0)/20, self.getRange(1)/10
+        self.gridSize = self.getRange(0) / 20, self.getRange(1) / 10
         self.annotationColor = kwargs.get('annotation_color', 'gray')
         self.annotation = []
         self.rect = (self.bottomLeft, self.topRight)
@@ -195,13 +198,16 @@ class ScopeGUI():
         gridColor = 'gray25'
         xs = linspace(self.bottomLeft[0], self.topRight[0], 20)
         for x in xs:
-            gl = self.graph.DrawLine((x, self.bottomLeft[1]), (x, self.topRight[1]), gridColor)
+            gl = self.graph.DrawLine((x, self.bottomLeft[1]),
+                                     (x, self.topRight[1]), gridColor)
             self.gridLines.append(gl)
 
         # draw y grid. 1 section == 1 volt.
         ys = linspace(self.bottomLeft[1], self.topRight[1], 10)
         for y in ys:
-            gl = self.graph.DrawLine((self.bottomLeft[0], y), (self.topRight[1], y), color=gridColor)
+            gl = self.graph.DrawLine((self.bottomLeft[0], y),
+                                     (self.topRight[1], y),
+                                     color=gridColor)
             self.gridLines.append(gl)
 
         self.canvas.config(cursor='cross')
@@ -239,20 +245,18 @@ class ScopeGUI():
         x, y = evValue
         if x is None or y is None:
             return
-        vL = self.graph.DrawLine( 
-                (x, self.bottomLeft[1]), (x, self.topRight[1])
-                , color = self.annotationColor
-                )
-        hL = self.graph.DrawLine( 
-                (self.bottomLeft[0], y), (self.topRight[0], y)
-                , color = self.annotationColor
-                )
+        vL = self.graph.DrawLine((x, self.bottomLeft[1]),
+                                 (x, self.topRight[1]),
+                                 color=self.annotationColor)
+        hL = self.graph.DrawLine((self.bottomLeft[0], y),
+                                 (self.topRight[0], y),
+                                 color=self.annotationColor)
         T, V = x, y * 5 / 255.0
         annText = f"{T:.1f} ms/{V:.2f}"
-        t = self.graph.DrawText(annText, (x,y+8), color='white'
-                , font='Helvetica 8')
+        t = self.graph.DrawText(annText, (x, y + 8),
+                                color='white',
+                                font='Helvetica 8')
         self.annotation.append((t, vL, hL))
-
 
     def handleMouseEvent(self, event, value):
         # draw a line and label at this point. Press escape to clear them.
@@ -263,5 +267,3 @@ class ScopeGUI():
             self.canvas.delete(l1)
             self.canvas.delete(l2)
             self.canvas.delete(t)
-
-
