@@ -81,7 +81,6 @@ class SerialReader():
                 break
         self.done = True
         self.close()
-        q.close()
         return True
 
     def changeDevice(self, devname):
@@ -93,7 +92,7 @@ class SerialReader():
         print( f"[INFO ] Chaning devname to {devname}" )
         self.devname = devname
         if os.path.exists(self.devname):
-            self.s.close()
+            self.s.close() if self.s else None
             self.port = self.devname
             self.s = serial.Serial(self.port, self.baud)
         self.lock.release()
