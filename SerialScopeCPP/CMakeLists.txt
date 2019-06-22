@@ -7,10 +7,13 @@ find_package(Threads REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR})
 
-add_subdirectory(Serial)
+add_subdirectory(serial)
+add_subdirectory(gui)
 
 add_executable(SerialScope main.cpp)
 
 target_link_libraries(SerialScope Serial 
     ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+    gui
+    # Qt5::Gui Qt5::Widgets
     )
