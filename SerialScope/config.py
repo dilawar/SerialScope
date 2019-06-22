@@ -16,7 +16,7 @@ logging.basicConfig(
     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
 logger = logging.getLogger('scope')
 
-Q_ = collections.deque([], 1000)
+Q_ = collections.deque([])
 
 # Find ports and log their value.
 ports_ = [

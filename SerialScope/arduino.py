@@ -44,32 +44,27 @@ class SerialReader():
             return True
         return False
 
-    def Read(self, N):
+    def Read(self):
         if self.isInternal():
-            data = []
             t = time.time()
-            for i in range(N//2):
-                a, b = (1+math.sin(2*math.pi*100*t))*128, (1+math.cos(2*math.pi*50*t))*64
-                data += [int(a), int(b)]
-            assert len(data) == N
-            time.sleep(0.0001)
-            return data
+            a, b = (1+math.sin(2*math.pi*100*t))*128, (1+math.cos(2*math.pi*50*t))*64
+            time.sleep(2e-5)
+            return [a, b]
         else:
+            N = 2**8
             data = self.s.read(N)
             data = [ord(x) for x in struct.unpack('c'*N, data)]
             return data
 
     def run(self, done):
         # Keep runing and put data in q. 
-        startT = time.time()
-        N = 2**8
         while True:
+            t0 = time.time()
             self.lock.acquire()
-            t0 = time.time() - startT
-            data = self.Read(2*N)
-            t1 = time.time() - startT
-            dt = (t1 - t0)/N
-            for i in range(N):
+            data = self.Read()
+            t1 = time.time()
+            dt = (t1 - t0)/len(data)//2
+            for i in range(len(data)//2):
                 t, a, b = t0+i*dt, data[2*i], data[2*i+1]
                 C.Q_.append((t, a, b))
             self.lock.release()
