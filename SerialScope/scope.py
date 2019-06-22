@@ -79,10 +79,9 @@ def collect_data(q, scope):
     # let the ArduinoClient directly send values to ScopeGUI?
     while True:
         data = []
-        while q.qsize() > 0 and len(data) < 100:
-            data.append(q.get())
-        print( q.qsize() )
-        scope.add_values(data)
+        #  while q.qsize() > 0 and len(data) < 10:
+            #  data.append(q.get())
+        scope.add_values([q.get()])
 
 def changeDevice(devname, scope):
     logger.info( f"Chaning device to {devname}")
