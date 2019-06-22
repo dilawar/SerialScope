@@ -16,6 +16,11 @@ maxX = config.rangeX_[1]
 maxY = config.rangeY_[1]
 nFrames = 0
 
+
+def defaultDevice():
+    return config.ports_[0] if config.ports_ else 'internal'
+
+
 # Two graphs. One for channel 1 and other for channel 2.
 graph = sg.Graph(canvas_size=(W * 2 // 3, 4 * H / 5),
                  graph_bottom_left=(0, -maxY),
@@ -43,7 +48,7 @@ xWidgets = sg.Frame('Time Axis', [[
 
 chAWidgets = sg.Frame('Channel A', [
     [
-        sg.Text("V/div", size=labelSize_, auto_size_text=True),
+        sg.Text("V/DIV", size=labelSize_, auto_size_text=True),
         sg.Slider(range=(0, 2),
                   orientation='h',
                   resolution=0.1,
@@ -69,7 +74,7 @@ chAWidgets = sg.Frame('Channel A', [
 # Make sure that default value of offsets are same as in GUI.
 chBWidgets = sg.Frame('Channel B', [
     [
-        sg.Text("V/div", size=labelSize_, auto_size_text=True),
+        sg.Text("V/DIV", size=labelSize_, auto_size_text=True),
         sg.Slider(range=(0, 2),
                   orientation='h',
                   resolution=0.1,
@@ -96,13 +101,14 @@ chBWidgets = sg.Frame('Channel B', [
 devices = sg.Listbox(values=config.ports_ + ['internal'],
                      size=(25, 3),
                      key='DEVICE',
-                     default_values='internal',
+                     default_values=defaultDevice(),
                      enable_events=True)
 serialWidgets = sg.Frame("Device", [[devices]])
 
 # Constuct layout.
 widgets = sg.Column([[xWidgets], [chAWidgets], [chBWidgets], [serialWidgets]],
                     key="widgets")
+
 layout = [[graph, widgets],
           [
               sg.Submit('PAUSE', key='toggle_run'),
