@@ -18,7 +18,7 @@ w_, h_ = 1200, 900
 try:
     from screeninfo import get_monitors
     m = get_monitors()[0]
-    w_, h_ = int(m.width//1.2), int(m.height//1.5)
+    w_, h_ = int(m.width//1.2), int(m.height//1.2)
 except Exception as e:
     logger.warn( "module screeninfo is not available: %s"%e)
     pass
