@@ -138,7 +138,7 @@ class ScopeGUI():
     Helper class for Scope GUI.
     """
 
-    def __init__(self, window):
+    def __init__(self, window, **kwargs):
         self.window = window
         self.freezeChannels = False
         self.nFrame = 0
@@ -155,6 +155,8 @@ class ScopeGUI():
         self.bottomLeft = (0, -255)
         self.topRight = (C.T_, 255)
         self.gridSize = self.getRange(0)/20, self.getRange(1)/10
+        self.annotationColor = kwargs.get('annotation_color', 'gray')
+        self.annotation = []
         self.rect = (self.bottomLeft, self.topRight)
         self.gridLines = []
         self.drawGrid()
@@ -202,9 +204,11 @@ class ScopeGUI():
             gl = self.graph.DrawLine((self.bottomLeft[0], y), (self.topRight[1], y), color=gridColor)
             self.gridLines.append(gl)
 
+        self.canvas.config(cursor='cross')
+
     @property
     def canvas(self):
-        return self.graph.TkCanvas
+        return self.graph.TKCanvas
 
     def attach_label(self):
         if 'label' in self.elems:
@@ -230,5 +234,34 @@ class ScopeGUI():
 
     def changeOffsetChannel(self, v, channelName):
         self.channels[channelName].changeOffsetChannel(v)
+
+    def createAnnotation(self, evName, evValue):
+        x, y = evValue
+        if x is None or y is None:
+            return
+        vL = self.graph.DrawLine( 
+                (x, self.bottomLeft[1]), (x, self.topRight[1])
+                , color = self.annotationColor
+                )
+        hL = self.graph.DrawLine( 
+                (self.bottomLeft[0], y), (self.topRight[0], y)
+                , color = self.annotationColor
+                )
+        T, V = x, y * 5 / 255.0
+        annText = f"{T:.1f} ms/{V:.2f}"
+        t = self.graph.DrawText(annText, (x,y+8), color='white'
+                , font='Helvetica 8')
+        self.annotation.append((t, vL, hL))
+
+
+    def handleMouseEvent(self, event, value):
+        # draw a line and label at this point. Press escape to clear them.
+        self.createAnnotation(event, value)
+
+    def clearAllAnnotations(self):
+        for (l1, l2, t) in self.annotation:
+            self.canvas.delete(l1)
+            self.canvas.delete(l2)
+            self.canvas.delete(t)
 
 

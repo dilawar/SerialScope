@@ -53,6 +53,11 @@ class Scope(gui.ScopeGUI):
         elif event.lower() == "channel-b-offset":
             v = values["channel-b-offset"]
             self.changeOffsetChannel(v, "B")
+        elif event.lower() == 'graph':
+            # handle graph events.
+            self.handleMouseEvent(event, values[event])
+        elif event.lower() == "clear-annotations":
+            self.clearAllAnnotations()
         else:
             logger.info( f"Event: {event} and {values}")
             logger.warn( f'Unsupported event' )

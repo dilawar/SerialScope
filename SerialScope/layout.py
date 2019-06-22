@@ -7,9 +7,7 @@ __maintainer__ = "Dilawar Singh"
 __email__ = "dilawars@ncbs.res.in"
 __status__ = "Development"
 
-import time
-import PySimpleGUI as sg
-
+import SerialScope.PySimpleGUI as sg
 from SerialScope import config
 
 W = config.w_
@@ -24,6 +22,7 @@ graph = sg.Graph(canvas_size=(W * 2 // 3, 2 * H // 3),
                  graph_bottom_left=(0, -maxY),
                  graph_top_right=(maxX, maxY),
                  background_color='black',
+                 float_values=True,
                  key='graph')
 
 #  currentTab = sg.Tab('Live', [[graph]])
@@ -101,8 +100,10 @@ chBWidgets = sg.Frame('Channel B', [
 # Constuct layout.
 widgets = sg.Column([[xWidgets], [chAWidgets], [chBWidgets]], key="widgets")
 layout = [[graph, widgets],
-          [sg.Submit('PAUSE', key='toggle_run'),
-           sg.Exit('Quit', key='quit')]]
+        [sg.Submit('PAUSE', key='toggle_run'),
+            sg.Button('Clear Annotations', key='clear-annotations'),
+            sg.Exit('Quit', key='quit')]
+        ]
 
 # We want it global. Otherwise garbage collected will destroy the images.
 images_ = {}
