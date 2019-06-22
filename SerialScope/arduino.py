@@ -51,7 +51,7 @@ class SerialReader():
             for i in range(N//2):
                 a, b = (1+math.sin(2*math.pi*100*t))*128, (1+math.cos(2*math.pi*50*t))*128
                 data += [int(a), int(b)]
-            time.sleep(0.0001)
+                time.sleep(0.0001)
             assert len(data) == N
             return data
         else:
