@@ -131,7 +131,7 @@ class Channel():
 
         self.draw_value()
         self.prev = self.curr
-        if self.nData % 1000 == 0:
+        if self.nData % 100 == 0:
             self.canvas.update()
 
 
