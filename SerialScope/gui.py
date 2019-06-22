@@ -252,7 +252,7 @@ class ScopeGUI():
                                  (self.topRight[0], y),
                                  color=self.annotationColor)
         T, V = x, y * 5 / 255.0
-        annText = f"{T:.1f} ms/{V:.2f}"
+        annText = f"{T*1000:.1f} ms/{V:.2f}"
         t = self.graph.DrawText(annText, (x, y + 8),
                                 color='white',
                                 font='Helvetica 8')
