@@ -49,10 +49,10 @@ class SerialReader():
             data = []
             t = time.time()
             for i in range(N//2):
-                a, b = (1+math.sin(2*math.pi*100*t))*128, (1+math.cos(2*math.pi*50*t))*128
+                a, b = (1+math.sin(2*math.pi*100*t))*128, (1+math.cos(2*math.pi*50*t))*64
                 data += [int(a), int(b)]
-                time.sleep(0.0001)
             assert len(data) == N
+            time.sleep(0.0001)
             return data
         else:
             data = self.s.read(N)
@@ -61,13 +61,13 @@ class SerialReader():
 
     def run(self, done):
         # Keep runing and put data in q. 
-        t0 = time.time()
+        startT = time.time()
         N = 2**8
         while True:
             self.lock.acquire()
-            t0 = time.time()
+            t0 = time.time() - startT
             data = self.Read(2*N)
-            t1 = time.time()
+            t1 = time.time() - startT
             dt = (t1 - t0)/N
             for i in range(N):
                 t, a, b = t0+i*dt, data[2*i], data[2*i+1]
