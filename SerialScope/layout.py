@@ -18,7 +18,7 @@ maxY = config.rangeY_[1]
 nFrames = 0
 
 # Two graphs. One for channel 1 and other for channel 2.
-graph = sg.Graph(canvas_size=(W * 2 // 3, 2 * H // 3),
+graph = sg.Graph(canvas_size=(W*2//3, 4*H/5),
                  graph_bottom_left=(0, -maxY),
                  graph_top_right=(maxX, maxY),
                  background_color='black',
