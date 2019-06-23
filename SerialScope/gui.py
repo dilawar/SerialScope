@@ -5,7 +5,6 @@ __copyright__ = "Copyright 2019-, Dilawar Singh"
 __maintainer__ = "Dilawar Singh"
 __email__ = "dilawars@ncbs.res.in"
 
-import sys
 from collections import defaultdict
 from SerialScope import config as C
 logger = C.logger
@@ -20,10 +19,6 @@ def linspace(minV, maxV, n):
     step = (maxV - minV) / n
     return arange(minV, maxV, step)
 
-def _print(msg):
-    print(end=msg)
-    sys.stdout.flush()
-
 class Channel():
     """
     Class for handling channel.
@@ -31,9 +26,9 @@ class Channel():
 
     def __init__(self, graph, **kwargs):
         self.graph = graph
-        self.redraw = 0
         self.lines = []
         self.color = kwargs.get('color', 'white')
+        self.nUpdate = 0
         self.offset = kwargs.get('offset', 0.0)
         self.freeze = False
         self.prev = (0.0, 0.0)
@@ -116,11 +111,11 @@ class Channel():
         Add value to channel, draw it and update the canvas.
         Make sure to delete old lines when we roll-over to next frame.
         """
-        self.redraw += 1
+        self.nUpdate += 1
         t0, y0 = self.prev
         t1 = t1 % (C.T_ / self.xScale)
         self.curr = t1, y1
-        if t0 > t1:
+        if t0 >= t1:
             # This is NOT obvious. But when freeze is set True by a key-press, we wait
             # till maximum time for which we can plot in the screen is passed. Then
             # we freeze. Note that moving this logic to end of this block will
@@ -130,16 +125,16 @@ class Channel():
                 return
             for l in self.lines:
                 self.canvas.delete(l)
-            _print('C')
             self.lines.clear()
             self.prev = (t1, y1)
+            self.nUpdate = 0
             return
 
         self.draw_value()
         self.prev = self.curr
-        if self.redraw >= 100:
+        if self.nUpdate > 200:
             self.canvas.update()
-            self.redraw = 0
+            self.nUpdate = 0
 
 
 class ScopeGUI():
@@ -231,8 +226,6 @@ class ScopeGUI():
             self.channels[ch].draw_axis()
 
     def add_values(self, data):
-        print( f'Adding {len(data)} points.' )
-        #  print( min(data), max(data))
         for t1, a1, b1 in data:
             self.channels["A"].add_value(t1, a1)
             self.channels["B"].add_value(t1, b1)
