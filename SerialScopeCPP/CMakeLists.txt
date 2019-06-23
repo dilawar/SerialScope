@@ -12,8 +12,6 @@ add_subdirectory(gui)
 
 add_executable(SerialScope main.cpp)
 
-target_link_libraries(SerialScope Serial 
+target_link_libraries(SerialScope serial gui
     ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    gui
-    # Qt5::Gui Qt5::Widgets
     )

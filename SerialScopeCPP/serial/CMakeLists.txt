@@ -1,1 +1,1 @@
-add_library(Serial STATIC BufferedAsyncSerial.cpp AsyncSerial.cpp)
+add_library(serial BufferedAsyncSerial.cpp AsyncSerial.cpp)
