@@ -74,5 +74,3 @@ void write_data_line( )
 }
 ```
 
-# CHANGELOG
-
