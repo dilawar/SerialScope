@@ -42,34 +42,33 @@ class SerialReader():
             return True
         elif self.devname.lower() == 'internal':
             return True
-        return False
+        return not self.s.isOpen()
 
-    def Read(self):
+    def Read(self, N, startT):
         if self.isInternal():
-            t = time.time()
-            a, b = (1+math.sin(2*math.pi*100*t))*128, (1+math.cos(2*math.pi*50*t))*64
-            time.sleep(2e-5)
-            return [a, b]
-        else:
-            N = 2**8
-            data = self.s.read(N)
-            data = [ord(x) for x in struct.unpack('c'*N, data)]
+            data = []
+            for i in range(N):
+                t = time.time() - startT
+                a, b = (1+math.sin(2*math.pi*100*t))*128, (1+math.cos(2*math.pi*50*t))*64
+                data.append((t, int(a), int(b)))
+                time.sleep(1e-4)
             return data
+        # Arduino
+        t0 = time.time() - startT
+        xx = self.s.read(2*N)
+        xx = [ord(x) for x in struct.unpack('c'*2*N, xx)]
+        dt = (time.time()-t0-startT)/N
+        data = []
+        for i in range(N):
+            data.append((t0+i*dt, xx[2*i], xx[2*i+1]))
+        return data
 
     def run(self, done):
         # Keep runing and put data in q. 
         startT = time.time()
-        lastT = time.time()
         while True:
-            #  t0 = time.time()
-            data = self.Read()
-            t1 = time.time()
-            dt = (t1 - lastT)/len(data)/2
-            for i in range(len(data)//2):
-                t, a, b = lastT+i*dt-startT, data[2*i], data[2*i+1]
-                C.Q_.append((t, a, b))
-            lastT = time.time()
-            time.sleep(1e-4)
+            data = self.Read(2**8, startT)
+            C.Q_ += data
             if done == 1:
                 logger.info( 'STOP acquiring data.' )
                 break
@@ -82,23 +81,18 @@ class SerialReader():
             devname = devname[0]
         if devname == self.devname:
             return
+        self.lock.acquire()
         print( f"[INFO ] Chaning devname to {devname}" )
         self.devname = devname
         if os.path.exists(self.devname):
             self.s.close() if self.s else None
             self.port = self.devname
             self.s = serial.Serial(self.port, self.baud)
+        self.lock.release()
 
     def close(self):
         logger.info( f"Calling close." )
         self.s.close()
-
-def plot_gnuplot(done):
-    while True:
-        X, A, B = [], [], []
-        while C.Q_:
-            x, a, b = C.Q_.popleft()
-            print(x, a, b)
 
 def test():
     import sys
@@ -107,10 +101,7 @@ def test():
     t = threading.Thread( target=s.run,  args=(done,))
     t.daemon = True
     t.start()
-    #u = threading.Thread( target=plot_gnuplot, args=(done,))
-    #u.daemon = True
-    #u.start()
-    time.sleep(100)
+    time.sleep(10)
     done = 1
     print(f"Total {len(C.Q_)} in 1 seconds.")
 
