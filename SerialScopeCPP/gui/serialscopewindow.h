@@ -1,18 +1,19 @@
 #ifndef SERIALSCOPEWINDOW_H
 #define SERIALSCOPEWINDOW_H
 
-#include <QMainWindow>
+#define NK_IMPLEMENTATION
+#define NK_INCLUDE_STANDARD_IO
+#define NK_INCLUDE_STANDARD_VARARGS
+#include "nuklear.h"
 
-class SerialScopeWindow : public QMainWindow
+class SerialScopeWindow 
 {
-    Q_OBJECT
-public:
-    explicit SerialScopeWindow(QWidget *parent = nullptr);
-    virtual ~SerialScopeWindow() { };
+    SerialScopeWindow();
+    ~SerialScopeWindow();
 
-signals:
+private:
+    struct nk_context ctx_;
 
-public slots:
 };
 
 #endif // SERIALSCOPEWINDOW_H

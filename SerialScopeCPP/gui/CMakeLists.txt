@@ -1,14 +1,4 @@
 cmake_minimum_required(VERSION 2.8)
-
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
-
-set(gui_SRC 
-    serialscopewindow.cpp
-    )
-
-include_directories(${Qt5_INCLUDE_DIR})
+set(gui_SRC serialscopewindow.cpp)
 add_library(gui ${gui_SRC})
-
-target_link_libraries(gui Qt5::Widgets)
+set_target_properties(gui PROPERTIES COMPILE_FLAGS "-Wno-unused-function")

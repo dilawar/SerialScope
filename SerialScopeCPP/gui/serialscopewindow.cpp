@@ -8,9 +8,17 @@
  *        License:  GPLv3
  */
 
+#include <memory>
+using namespace std;
+
 #include "serialscopewindow.h"
 
-SerialScopeWindow::SerialScopeWindow(QWidget *parent) : QMainWindow(parent)
+SerialScopeWindow::SerialScopeWindow( )
 {
+    nk_init_default(&ctx_);
+}
 
+SerialScopeWindow::~SerialScopeWindow()
+{
+    nk_free(&ctx_);
 }
