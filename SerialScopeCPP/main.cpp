@@ -16,18 +16,18 @@
 
 #include <iostream>
 #include <deque>
+#include <tuple>
 #include <future>
 #include <chrono>
 
 #include <QtWidgets/QApplication>
 
 #include "serial/BufferedAsyncSerial.h"
-#include "gui/serialscopewindow.h"
+#include "gui/mainwindow.h"
 
 using namespace std;
 
-// Globals.
-std::deque<std::tuple<double, unsigned, unsigned>> data_;
+std::deque<elem_type> data_;
 auto startT = std::chrono::system_clock::now();
 char channel_[2];
 
@@ -42,7 +42,7 @@ void collect_arduino_data(BufferedAsyncSerial& s)
     }
 }
 
-void plot_arduino_data( )
+void plot_arduino_data(MainWindow& win)
 {
     while(true)
     {
@@ -50,21 +50,23 @@ void plot_arduino_data( )
             continue;
         auto d = data_.front();
         data_.pop_front();
-        cout << std::get<0>(d) << " " << std::get<1>(d) << " " << std::get<2>(d) << endl;
+        win.addData(d);
     }
 }
 
 int main(int argc, char *argv[])
 {
     BufferedAsyncSerial s( "/dev/ttyACM0", 115200);
-    auto p1 = std::async( std::launch::async, [&s]{ collect_arduino_data(s); } );
-    auto p2 = std::async( std::launch::async, plot_arduino_data);
 
     // Create GUI application.
     QApplication app(argc, argv);
-
-    SerialScopeWindow win;
+    MainWindow win;
     win.show();
+
+    // Launch processes.
+    auto p1 = std::async( std::launch::async, [&s]{ collect_arduino_data(s); } );
+    auto p2 = std::async( std::launch::async, [&win]{ plot_arduino_data(win); });
+
     app.exec();
 
     p1.wait();

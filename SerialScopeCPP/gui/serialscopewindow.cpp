@@ -8,9 +8,16 @@
  *        License:  GPLv3
  */
 
+#include <QHBoxLayout>
+#include <QWidget>
 #include "serialscopewindow.h"
 
-SerialScopeWindow::SerialScopeWindow(QWidget *parent) : QMainWindow(parent)
+SerialScopeWindow::SerialScopeWindow(QWidget *parent): QMainWindow(parent)
 {
-
+    QHBoxLayout *layout = new QHBoxLayout;
+    QWidget* mainW = new QWidget;
+    layout->addWidget(mainW);
+    setLayout(layout);
+    mainW->show();
+    setCentralWidget(mainW);
 }
