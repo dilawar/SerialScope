@@ -20,6 +20,20 @@ import SerialScope.config as C
 import logging
 logger = logging.getLogger("arduino")
 
+def interalFun(t):
+    return (math.sin(2*math.pi*100*t))*128, (math.cos(2*math.pi*50*t))*64
+
+def idealDelayForInteral():
+    # In one second, I need to generate 5k samples. Usually most computer will
+    # generate is way to fast; so I need to add delay. Some computers are slow
+    # so this number can not be fixed.
+    t0 = time.time()
+    data = []
+    while len(data) < 5e3:
+        t = time.time() - t0
+        data.append(interalFun(t))
+    return max(0, (1-t)/5e3)
+
 class SerialReader():
     """docstring for SerialReader"""
     def __init__(self, port, baud, debug = False):
@@ -31,6 +45,8 @@ class SerialReader():
         self.debug = debug
         self.devname = ''
         self.lock = threading.Lock()
+        self.internalDelay = idealDelayForInteral()
+        print( self.internalDelay )
         try:
             self.s = serial.Serial(port, baud)
         except Exception as e:
@@ -49,9 +65,9 @@ class SerialReader():
             data = []
             for i in range(N):
                 t = time.time() - startT
-                a, b = (1+math.sin(2*math.pi*100*t))*128, (1+math.cos(2*math.pi*50*t))*64
+                a, b = interalFun(t)
                 data.append((t, int(a), int(b)))
-                time.sleep(1e-4)
+                time.sleep( self.internalDelay )
             return data
         # Arduino
         t0 = time.time() - startT
