@@ -9,5 +9,5 @@ test :
 
 upload : 
 	python3 setup.py sdist
-	twine check dist/*
-	twine upload dist/*
+	python3 -m twine check dist/*
+	python3 -m twine upload dist/*
