@@ -58,16 +58,18 @@ class SerialReader():
 
     def run(self, done):
         # Keep runing and put data in q. 
+        startT = time.time()
+        lastT = time.time()
         while True:
-            t0 = time.time()
-            self.lock.acquire()
+            #  t0 = time.time()
             data = self.Read()
             t1 = time.time()
-            dt = (t1 - t0)/len(data)//2
+            dt = (t1 - lastT)/len(data)/2
             for i in range(len(data)//2):
-                t, a, b = t0+i*dt, data[2*i], data[2*i+1]
+                t, a, b = lastT+i*dt-startT, data[2*i], data[2*i+1]
                 C.Q_.append((t, a, b))
-            self.lock.release()
+            lastT = time.time()
+            time.sleep(1e-4)
             if done == 1:
                 logger.info( 'STOP acquiring data.' )
                 break
@@ -80,18 +82,23 @@ class SerialReader():
             devname = devname[0]
         if devname == self.devname:
             return
-        self.lock.acquire()
         print( f"[INFO ] Chaning devname to {devname}" )
         self.devname = devname
         if os.path.exists(self.devname):
             self.s.close() if self.s else None
             self.port = self.devname
             self.s = serial.Serial(self.port, self.baud)
-        self.lock.release()
 
     def close(self):
         logger.info( f"Calling close." )
         self.s.close()
+
+def plot_gnuplot(done):
+    while True:
+        X, A, B = [], [], []
+        while C.Q_:
+            x, a, b = C.Q_.popleft()
+            print(x, a, b)
 
 def test():
     import sys
@@ -100,7 +107,10 @@ def test():
     t = threading.Thread( target=s.run,  args=(done,))
     t.daemon = True
     t.start()
-    time.sleep(10)
+    #u = threading.Thread( target=plot_gnuplot, args=(done,))
+    #u.daemon = True
+    #u.start()
+    time.sleep(100)
     done = 1
     print(f"Total {len(C.Q_)} in 1 seconds.")
 
