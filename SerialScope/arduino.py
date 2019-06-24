@@ -13,12 +13,10 @@ import time
 import os
 import threading
 import math
-import collections
 import struct
 import SerialScope.config as C
 
-import logging
-logger = logging.getLogger("arduino")
+logger = C.logger
 
 def interalFun(t):
     return (math.sin(2*math.pi*100*t))*128, (math.cos(2*math.pi*50*t))*64
@@ -47,6 +45,7 @@ class SerialReader():
         self.lock = threading.Lock()
         self.internalDelay = idealDelayForInteral()
         try:
+            logger.info(f"Opening {port} with baud rate {baud}")
             self.s = serial.Serial(port, baud)
         except Exception as e:
             print(e)

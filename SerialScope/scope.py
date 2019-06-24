@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
     
 __author__           = "Dilawar Singh"
-__copyright__        = "Copyright 2017-, Dilawar Singh"
-__version__          = "1.0.0"
-__maintainer__       = "Dilawar Singh"
-__email__            = "dilawars@ncbs.res.in"
-__status__           = "Development"
+__copyright__        = "Copyright 2019-, Dilawar Singh"
 
 import threading
-import collections
+import logging
 
 from SerialScope import arduino
 from SerialScope import layout 
@@ -88,10 +84,18 @@ def changeDevice(devname, scope):
     logger.info( f"Chaning device to {devname}")
     scope.changeDevice(devname)
 
-def main(args):
+def main(cmd):
     # Launch arduino reader.
     clientDone = 0
-    arduinoClient = arduino.SerialReader(layout.defaultDevice(), args.baudrate)
+    if cmd.port.strip():
+        C.ports_.insert(0, cmd.port.strip())
+
+    if cmd.debug:
+        C.logger.setLevel(logging.DEBUG)
+    else:
+        C.logger.setLevel(logging.WARNING)
+
+    arduinoClient = arduino.SerialReader(layout.defaultDevice(), cmd.baudrate)
     arduinoP = threading.Thread(target=arduinoClient.run, args=(clientDone,))
     arduinoP.daemon = True
     arduinoP.start()

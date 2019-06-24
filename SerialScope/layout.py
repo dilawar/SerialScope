@@ -1,14 +1,13 @@
-#
 # -*- coding: utf-8 -*-
 
 __author__ = "Dilawar Singh"
 __copyright__ = "Copyright 2019-, Dilawar Singh"
 __version__ = "1.0.0"
-__maintainer__ = "Dilawar Singh"
-__email__ = "dilawars@ncbs.res.in"
 
 import SerialScope.PySimpleGUI as sg
 from SerialScope import config
+from SerialScope.version import __version__
+
 W = config.w_
 H = config.h_
 
@@ -16,10 +15,11 @@ maxX = config.rangeX_[1]
 maxY = config.rangeY_[1]
 nFrames = 0
 
+logger = config.logger
 
 def defaultDevice():
-    return config.ports_[0] if config.ports_ else 'internal'
-
+    logger.debug( f"Availabel ports: {config.ports_}" )
+    return config.ports_[0] if config.ports_ else 'demo'
 
 # Two graphs. One for channel 1 and other for channel 2.
 graph = sg.Graph(canvas_size=(W * 2 // 3, 4 * H / 5),
@@ -118,4 +118,4 @@ layout = [[graph, widgets],
 
 # We want it global. Otherwise garbage collected will destroy the images.
 images_ = {}
-mainWindow = sg.Window('Arduino Scope').Layout(layout).Finalize()
+mainWindow = sg.Window('Serial Scope (%s)' % __version__).Layout(layout).Finalize()

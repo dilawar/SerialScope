@@ -2,7 +2,7 @@ all : arduino
 	python3 -m SerialScope
 
 arduino:
-	cd ./arduino && make upload
+	cd ./SerialScopeArduino && make upload
 
 test :
 	python3 -m SerialScope

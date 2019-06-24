@@ -1,7 +1,5 @@
 /***
  *    Protocol for Signal Generator.
- *
- *
  *  See the GIT changelog for more details.
  */
 
