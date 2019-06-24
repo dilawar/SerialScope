@@ -11,9 +11,6 @@ import logging
 import collections
 import serial.tools.list_ports
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
 logger = logging.getLogger('scope')
 
 Q_ = collections.deque([], 2**14)
@@ -22,6 +19,7 @@ Q_ = collections.deque([], 2**14)
 ports_ = [
     x for x in serial.tools.list_ports.comports() if x.manufacturer is not None
 ]
+
 ports_ = [x.device for x in ports_ if x.vid == 9025]
 logging.debug(f"Found ports {ports_}")
 

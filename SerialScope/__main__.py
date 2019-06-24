@@ -10,14 +10,15 @@ def main(args=None):
     description = '''Arduino NeuroScope.'''
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--port', '-p', type=str
-            , default = '/dev/ttyACM0'
-            , required = False
+            , required = False, default= ''
             , help = 'Serial port.'
             )
     parser.add_argument('--baudrate', '-B'
-            , required = False, default = 115200
+            , required = False
+            , default = 115200
             , help = 'Baudrate of Arduino board.'
             )
+    parser.add_argument( '--debug', '-d', action='store_true')
     class Args: pass
     args = Args()
     parser.parse_args(namespace=args)
