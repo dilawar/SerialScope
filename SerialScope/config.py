@@ -35,7 +35,6 @@ except Exception as e:
     logger.warning("module screeninfo is not available: %s" % e)
     pass
 
-
 def log(msg, level=1):
     logger.log(level, msg)
 
