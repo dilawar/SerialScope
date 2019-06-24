@@ -81,3 +81,6 @@ void write_data_line( )
     Serial.flush();
 }
 ```
+
+A sketch is available in `SerialScopeArduino/` directory. Open it in your
+arduino IDE and upload to your Arduino board. 
