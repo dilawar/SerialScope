@@ -7,7 +7,10 @@ arduino:
 test :
 	python3 -m SerialScope
 
-upload : 
+dist :
 	python3 setup.py sdist
+
+
+upload :  dist
 	twine check dist/*
 	twine upload dist/*
