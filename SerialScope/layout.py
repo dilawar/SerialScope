@@ -9,6 +9,8 @@ __email__ = "dilawars@ncbs.res.in"
 
 import SerialScope.PySimpleGUI as sg
 from SerialScope import config
+from SerialScope.version import __version__
+
 W = config.w_
 H = config.h_
 
@@ -118,4 +120,4 @@ layout = [[graph, widgets],
 
 # We want it global. Otherwise garbage collected will destroy the images.
 images_ = {}
-mainWindow = sg.Window('Arduino Scope').Layout(layout).Finalize()
+mainWindow = sg.Window('Serial Scope (%s)' % __version__).Layout(layout).Finalize()

@@ -57,7 +57,7 @@ OBJDIR            = $(PROJECT_DIR)/bin/$(BOARD_TAG)/$(CURRENT_DIR)
 ARDUINO_LIBS      = 
 
 # INO file and other cpp files
-LOCAL_INO_SRCS     = $(PROJECT_DIR)/src/main.ino 
+LOCAL_INO_SRCS     = $(PROJECT_DIR)/SerialScopeArduino.ino 
 LOCAL_CPP_SRCS     = 
 
 ### Do not touch - the path to Arduino.mk, inside the ARDMK_DIR
