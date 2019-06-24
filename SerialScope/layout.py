@@ -98,12 +98,12 @@ chBWidgets = sg.Frame('Channel B', [
 ])
 
 # Serial port
-devices = sg.Listbox(values=config.ports_ + ['internal'],
+devices = sg.Listbox(values=config.ports_ + ['demo'],
                      size=(25, 3),
                      key='DEVICE',
                      default_values=defaultDevice(),
                      enable_events=True)
-serialWidgets = sg.Frame("Device", [[devices]])
+serialWidgets = sg.Frame("Devices", [[devices]])
 
 # Constuct layout.
 widgets = sg.Column([[xWidgets], [chAWidgets], [chBWidgets], [serialWidgets]],

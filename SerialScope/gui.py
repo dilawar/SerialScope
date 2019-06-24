@@ -9,7 +9,6 @@ from collections import defaultdict
 from SerialScope import config as C
 logger = C.logger
 
-
 def arange(minV, maxV, step):
     vals = [minV + i * step for i in range(0, int((maxV - minV) / step))]
     return vals

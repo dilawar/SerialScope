@@ -55,7 +55,7 @@ class SerialReader():
     def isInternal(self):
         if self.s is None:
             return True
-        elif self.devname.lower() == 'internal':
+        elif self.devname.lower() == 'demo':
             return True
         return not self.s.isOpen()
 
@@ -82,7 +82,9 @@ class SerialReader():
         # Keep runing and put data in q. 
         startT = time.time()
         while True:
+            self.lock.acquire()
             data = self.Read(2**8, startT)
+            self.lock.release()
             C.Q_ += data
             if done == 1:
                 logger.info( 'STOP acquiring data.' )
@@ -96,13 +98,16 @@ class SerialReader():
             devname = devname[0]
         if devname == self.devname:
             return
+        print( f"[INFO ] Changing device to {devname} from {self.devname}" )
         self.lock.acquire()
-        print( f"[INFO ] Chaning devname to {devname}" )
+        if devname.lower() == self.devname:
+            return
         self.devname = devname
         if os.path.exists(self.devname):
             self.s.close() if self.s else None
             self.port = self.devname
             self.s = serial.Serial(self.port, self.baud)
+            time.sleep(0.5)
         self.lock.release()
 
     def close(self):
