@@ -32,7 +32,7 @@ def idealDelayForInteral():
     while len(data) < 5e3:
         t = time.time() - t0
         data.append(interalFun(t))
-    return max(0, (1-t)/5e3)
+    return max(0, (1-t)/10e3)
 
 class SerialReader():
     """docstring for SerialReader"""
@@ -46,7 +46,6 @@ class SerialReader():
         self.devname = ''
         self.lock = threading.Lock()
         self.internalDelay = idealDelayForInteral()
-        print( self.internalDelay )
         try:
             self.s = serial.Serial(port, baud)
         except Exception as e:
