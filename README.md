@@ -1,4 +1,4 @@
-[![PyPI version](https://badge.fury.io/py/SerialScope.svg)](https://badge.fury.io/py/SerialScope)
+[![PyPI version](https://badge.fury.io/py/SerialScope.svg)](https://badge.fury.io/py/SerialScope) ![](https://img.shields.io/pypi/pyversions/serialscope.svg)
 
 A serial port dual-channel oscilloscope. __Python 3 only__. 
 
