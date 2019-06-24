@@ -1,6 +1,6 @@
 [![PyPI version](https://badge.fury.io/py/SerialScope.svg)](https://badge.fury.io/py/SerialScope)
 
-A serial port dual-channel oscilloscope. 
+A serial port dual-channel oscilloscope. __Python 3 only__. 
 
 ![Screenshot (v0.1.3)](https://user-images.githubusercontent.com/895681/59994995-83506400-9673-11e9-861a-eb4f2984905e.png)
 
