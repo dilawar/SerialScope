@@ -251,11 +251,11 @@ class ScopeGUI():
         hL = self.graph.DrawLine((self.bottomLeft[0], y),
                                  (self.topRight[0], y),
                                  color=self.annotationColor)
-        T, V = x, y * 5 / 255.0
-        annText = f"{T*1000:.1f} ms/{V:.2f}"
+        T, V = x / self.gridSize[0], y / self.gridSize[1]
+        annText = f"{T:.1f},{V:.1f}"
         t = self.graph.DrawText(annText, (x, y + 8),
                                 color='white',
-                                font='Helvetica 8')
+                                font='Helvetica 10')
         self.annotation.append((t, vL, hL))
 
     def handleMouseEvent(self, event, value):
