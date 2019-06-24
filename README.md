@@ -2,9 +2,7 @@
 
 A serial port oscilloscope. 
 
-![Screenshot (v0.1.3)](https://github.com/dilawar/SerialScope/releases/download/v0.1.3/screenshot.png)
-
-# Install
+![Screenshot (v0.1.3)](https://user-images.githubusercontent.com/895681/59994995-83506400-9673-11e9-861a-eb4f2984905e.png)
 
     $ pip install SerialScope --user    # just for you
 or,
