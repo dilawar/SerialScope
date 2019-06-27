@@ -13,6 +13,17 @@ import SerialScope.config as C
 
 logger = C.logger
 
+ 
+def collect_data(scope):
+    # A threaded function. Its job is to collect data from Queue which is being
+    # filled by Arduino client and send those values to ScopeGUI. May be we can
+    # let the ArduinoClient directly send values to ScopeGUI?
+    while True:
+        data = []
+        while C.Q_:
+            data.append(C.Q_.popleft())
+        scope.add_values(data) if data else None
+
 class Scope(gui.ScopeGUI):
     """
     Main class for Scope.
@@ -23,15 +34,10 @@ class Scope(gui.ScopeGUI):
         self.arduino = arduino
 
     def handleEvents(self):
-        event, values = self.window.Read(timeout=0.05)
+        event, values = self.window.Read( )
         # A threaded function. Its job is to collect data from Queue which is being
         # filled by Arduino client and send those values to ScopeGUI. May be we can
         # let the ArduinoClient directly send values to ScopeGUI?
-        data = []
-        while C.Q_:
-            data.append(C.Q_.popleft())
-        self.add_values(data) if data else None
-
         if event is None or event.lower() == 'quit':  
             self.done = True
             return
@@ -101,7 +107,14 @@ def main(cmd):
     arduinoP.daemon = True
     arduinoP.start()
 
-    # Launch the scope. This consumes data from arduino Q.
+    # create a scope and share it with arduino client.
     scope = Scope(layout.mainWindow, arduinoClient)
+
+    # This can not be a multiprocessing Process since XinitThreads. Use it in
+    # main process with timeout.
+    scopeP = threading.Thread(target=collect_data, args=(scope,))
+    scopeP.daemon = True
+    scopeP.start()
+
     scope.run()
     logger.info("ALL DONE. Window is closed." )

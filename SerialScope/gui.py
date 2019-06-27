@@ -141,6 +141,7 @@ class ScopeGUI():
         self.window = window
         self.freezeChannels = False
         self.nFrame = 0
+        self.nUpdate = 0
         self.prev = 0.0, 0.0, 0.0
         self.curr = self.prev
         self.elems = defaultdict(list)
@@ -221,10 +222,14 @@ class ScopeGUI():
             self.channels[ch].draw_axis()
 
     def add_values(self, data):
+        self.nUpdate += 1
         for t1, a1, b1 in data:
             self.channels["A"].add_value(t1, a1)
             self.channels["B"].add_value(t1, b1)
-        self.canvas.update()
+
+        if self.nUpdate > 250:
+            self.canvas.update()
+            self.nUpdate = 0
 
 
     def changeResolutionXAxis(self, v):

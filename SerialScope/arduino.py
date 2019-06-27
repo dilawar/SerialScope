@@ -25,10 +25,10 @@ def idealDelayForInteral():
     # In one second, I need to generate 5k samples. Usually most computer will
     # generate is way to fast; so I need to add delay. Some computers are slow
     # so this number can not be fixed.
-    t0 = time.time()
+    t0 = time.perf_counter()
     data = []
     while len(data) < 5e3:
-        t = time.time() - t0
+        t = time.perf_counter() - t0
         data.append(interalFun(t))
     return max(0, (1-t)/10e3)
 
@@ -62,16 +62,16 @@ class SerialReader():
         if self.isInternal():
             data = []
             for i in range(N):
-                t = time.time() - startT
+                t = time.perf_counter() - startT
                 a, b = interalFun(t)
                 data.append((t, int(a), int(b)))
-                time.sleep( self.internalDelay )
+                C.sleep( self.internalDelay )
             return data
         # Arduino
-        t0 = time.time() - startT
+        t0 = time.perf_counter() - startT
         xx = self.s.read(2*N)
         xx = [ord(x) for x in struct.unpack('c'*2*N, xx)]
-        dt = (time.time()-t0-startT)/N
+        dt = (time.perf_counter()-t0-startT)/N
         data = []
         for i in range(N):
             data.append((t0+i*dt, xx[2*i], xx[2*i+1]))
@@ -79,7 +79,7 @@ class SerialReader():
 
     def run(self, done):
         # Keep runing and put data in q. 
-        startT = time.time()
+        startT = time.perf_counter()
         while True:
             self.lock.acquire()
             data = self.Read(2**8, startT)
@@ -106,7 +106,7 @@ class SerialReader():
             self.s.close() if self.s else None
             self.port = self.devname
             self.s = serial.Serial(self.port, self.baud)
-            time.sleep(0.5)
+            C.sleep(0.5)
         self.lock.release()
 
     def close(self):
@@ -120,9 +120,9 @@ def test():
     t = threading.Thread( target=s.run,  args=(done,))
     t.daemon = True
     t.start()
-    time.sleep(10)
+    C.sleep(10)
     done = 1
-    print("Total {} in 1 seconds.".format(len(C.Q_)))
+    print("Total {} in 10 seconds. Expected >10k".format(len(C.Q_)))
 
 if __name__ == '__main__':
     test()
