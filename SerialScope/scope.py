@@ -23,7 +23,15 @@ class Scope(gui.ScopeGUI):
         self.arduino = arduino
 
     def handleEvents(self):
-        event, values = self.window.Read()
+        event, values = self.window.Read(timeout=0.05)
+        # A threaded function. Its job is to collect data from Queue which is being
+        # filled by Arduino client and send those values to ScopeGUI. May be we can
+        # let the ArduinoClient directly send values to ScopeGUI?
+        data = []
+        while C.Q_:
+            data.append(C.Q_.popleft())
+        self.add_values(data) if data else None
+
         if event is None or event.lower() == 'quit':  
             self.done = True
             return
@@ -58,8 +66,10 @@ class Scope(gui.ScopeGUI):
             self.clearAllAnnotations()
         elif event.lower() == 'device':
             self.arduino.changeDevice( values[event] )
+        elif event.lower() == "__timeout__":
+            return
         else:
-            logger.info("Event: {} and {}".format(event, values))
+            logger.warn("Event: {} and {}".format(event, values))
             logger.warn('Unsupported event' )
 
     def run(self):
@@ -70,15 +80,6 @@ class Scope(gui.ScopeGUI):
         self.window.Close()
 
 
-def collect_data(scope):
-    # A threaded function. Its job is to collect data from Queue which is being
-    # filled by Arduino client and send those values to ScopeGUI. May be we can
-    # let the ArduinoClient directly send values to ScopeGUI?
-    while True:
-        data = []
-        while C.Q_:
-            data.append(C.Q_.popleft())
-        scope.add_values(data) if data else None
 
 def changeDevice(devname, scope):
     logger.info("Chaning device to {}".format(devname))
@@ -100,14 +101,7 @@ def main(cmd):
     arduinoP.daemon = True
     arduinoP.start()
 
-    # create a scope and share it with arduino client.
+    # Launch the scope. This consumes data from arduino Q.
     scope = Scope(layout.mainWindow, arduinoClient)
-
-    # This can not be a multiprocessing Process since XinitThreads. Use it in
-    # main process with timeout.
-    scopeP = threading.Thread(target=collect_data, args=(scope,))
-    scopeP.daemon = True
-    scopeP.start()
-
     scope.run()
     logger.info("ALL DONE. Window is closed." )

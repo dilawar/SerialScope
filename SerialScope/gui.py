@@ -130,9 +130,6 @@ class Channel():
 
         self.draw_value()
         self.prev = self.curr
-        if self.nUpdate > 200:
-            self.canvas.update()
-            self.nUpdate = 0
 
 
 class ScopeGUI():
@@ -227,6 +224,8 @@ class ScopeGUI():
         for t1, a1, b1 in data:
             self.channels["A"].add_value(t1, a1)
             self.channels["B"].add_value(t1, b1)
+        self.canvas.update()
+
 
     def changeResolutionXAxis(self, v):
         logger.info("Updating x-resolution to {}".format(v))
