@@ -16,11 +16,10 @@ logger = logging.getLogger('scope')
 Q_ = collections.deque([], 2**14)
 
 # Find ports and log their value.
-ports_ = [
-    x for x in serial.tools.list_ports.comports() if x.manufacturer is not None
-]
-
-ports_ = [x.device for x in ports_ if x.vid == 9025]
+ports_ = [x.device for x in serial.tools.list_ports.comports() \
+        if x.vid is not None \
+            and  x.pid is not None \
+            and x.device is not None]
 logging.debug("Found ports {}".format(ports_))
 
 # set resolution.
