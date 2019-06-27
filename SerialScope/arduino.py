@@ -122,7 +122,7 @@ def test():
     t.start()
     C.sleep(10)
     done = 1
-    print("Total {} in 1 seconds.".format(len(C.Q_)))
+    print("Total {} in 10 seconds. Expected >10k".format(len(C.Q_)))
 
 if __name__ == '__main__':
     test()
