@@ -2569,14 +2569,7 @@ class Graph(Element):
             return
         converted_point_from = self._convert_xy_to_canvas_xy(point_from[0], point_from[1])
         converted_point_to = self._convert_xy_to_canvas_xy(point_to[0], point_to[1])
-        if self._TKCanvas2 is None:
-            print('*** WARNING - The Graph element has not been finalized and cannot be drawn upon ***')
-            print('Call Window.Finalize() prior to this operation')
-            return None
-        try:  # in case window was closed with an X
-            id = self._TKCanvas2.create_line(converted_point_from, converted_point_to, width=width, fill=color)
-        except:
-            id = None
+        id = self._TKCanvas2.create_line(converted_point_from, converted_point_to, width=width, fill=color)
         return id
 
     def DrawPoint(self, point, size=2, color='black'):

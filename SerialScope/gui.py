@@ -89,6 +89,7 @@ class Channel():
             (t0 * self.xScale, self.offset + (y0 * self.yScale)),
             (t1 * self.xScale, self.offset + (y1 * self.yScale)),
             color=self.color)
+        assert l is not None, "Line not drawn"
         self.lines.append(l)
 
     def changeResolutionXAxis(self, v):
@@ -119,6 +120,7 @@ class Channel():
             # we freeze. Note that moving this logic to end of this block will
             # defeat the purpose. If you doubt me; just move the following two lines
             # around.
+            print( 'Clean', t0, t1 )
             if self.freeze:
                 return
             for l in self.lines:
@@ -141,6 +143,7 @@ class ScopeGUI():
         self.window = window
         self.freezeChannels = False
         self.nFrame = 0
+        self.nUpdate = 0
         self.prev = 0.0, 0.0, 0.0
         self.curr = self.prev
         self.elems = defaultdict(list)
@@ -221,10 +224,15 @@ class ScopeGUI():
             self.channels[ch].draw_axis()
 
     def add_values(self, data):
+        print("Adding %d values to canvas" % len(data))
+        self.nUpdate += 1
         for t1, a1, b1 in data:
             self.channels["A"].add_value(t1, a1)
             self.channels["B"].add_value(t1, b1)
-        self.canvas.update()
+
+        if self.nUpdate > 250:
+            self.canvas.update()
+            self.nUpdate = 0
 
 
     def changeResolutionXAxis(self, v):
