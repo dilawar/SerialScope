@@ -120,7 +120,6 @@ class Channel():
             # we freeze. Note that moving this logic to end of this block will
             # defeat the purpose. If you doubt me; just move the following two lines
             # around.
-            print( 'Clean', t0, t1 )
             if self.freeze:
                 return
             for l in self.lines:
@@ -224,7 +223,6 @@ class ScopeGUI():
             self.channels[ch].draw_axis()
 
     def add_values(self, data):
-        print("Adding %d values to canvas" % len(data))
         self.nUpdate += 1
         for t1, a1, b1 in data:
             self.channels["A"].add_value(t1, a1)
