@@ -1,6 +1,6 @@
 [![PyPI version](https://badge.fury.io/py/SerialScope.svg)](https://badge.fury.io/py/SerialScope) ![](https://img.shields.io/pypi/pyversions/serialscope.svg)
 
-A serial port dual-channel oscilloscope. __Python 3 only__. 
+A serial port dual-channel oscilloscope. __Python 3 only. Very slugging performance on Windows__. 
 
 ![Screenshot (v0.1.3)](https://user-images.githubusercontent.com/895681/59994995-83506400-9673-11e9-861a-eb4f2984905e.png)
 
@@ -23,7 +23,7 @@ or,
 The default baud rate is `115200`. The oscilloscope will automatically 
 find any serial port which has arduino connected to it.
 
-__TODO/FIXME__ You can change these values from command line
+You can change these values from command line
 
 ```
 usage: serialscope [-h] [--port PORT] [--baudrate BAUDRATE]
