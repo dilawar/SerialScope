@@ -23,8 +23,7 @@ class Scope(gui.ScopeGUI):
         self.arduino = arduino
 
     def handleEvents(self):
-        # 20 FPS are plenty. 1/20 sec timeout should be easy on eyes.
-        event, values = self.window.Read(timeout=0.01)
+        event, values = self.window.Read(timeout=0.05)
         # A threaded function. Its job is to collect data from Queue which is being
         # filled by Arduino client and send those values to ScopeGUI. May be we can
         # let the ArduinoClient directly send values to ScopeGUI?
