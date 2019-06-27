@@ -45,7 +45,7 @@ class SerialReader():
         self.lock = threading.Lock()
         self.internalDelay = idealDelayForInteral()
         try:
-            logger.info(f"Opening {port} with baud rate {baud}")
+            logger.info("Opening {} with baud rate {}".format(port, baud))
             self.s = serial.Serial(port, baud)
         except Exception as e:
             print(e)
@@ -97,7 +97,7 @@ class SerialReader():
             devname = devname[0]
         if devname == self.devname:
             return
-        print( f"[INFO ] Changing device to {devname} from {self.devname}" )
+        logger.info("Changing device to {} from {}".format(devname, self.devname))
         self.lock.acquire()
         if devname.lower() == self.devname:
             return
@@ -110,7 +110,7 @@ class SerialReader():
         self.lock.release()
 
     def close(self):
-        logger.info( f"Calling close." )
+        logger.info("Calling close." )
         self.s.close()
 
 def test():
@@ -122,7 +122,7 @@ def test():
     t.start()
     time.sleep(10)
     done = 1
-    print(f"Total {len(C.Q_)} in 1 seconds.")
+    print("Total {} in 1 seconds.".format(len(C.Q_)))
 
 if __name__ == '__main__':
     test()

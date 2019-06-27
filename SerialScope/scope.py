@@ -59,8 +59,8 @@ class Scope(gui.ScopeGUI):
         elif event.lower() == 'device':
             self.arduino.changeDevice( values[event] )
         else:
-            logger.info( f"Event: {event} and {values}")
-            logger.warn( f'Unsupported event' )
+            logger.info("Event: {} and {}".format(event, values))
+            logger.warn('Unsupported event' )
 
     def run(self):
         while True:
@@ -81,7 +81,7 @@ def collect_data(scope):
         scope.add_values(data) if data else None
 
 def changeDevice(devname, scope):
-    logger.info( f"Chaning device to {devname}")
+    logger.info("Chaning device to {}".format(devname))
     scope.changeDevice(devname)
 
 def main(cmd):
@@ -110,4 +110,4 @@ def main(cmd):
     scopeP.start()
 
     scope.run()
-    logger.info( f"ALL DONE. Window is closed." )
+    logger.info("ALL DONE. Window is closed." )

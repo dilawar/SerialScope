@@ -21,7 +21,7 @@ ports_ = [
 ]
 
 ports_ = [x.device for x in ports_ if x.vid == 9025]
-logging.debug(f"Found ports {ports_}")
+logging.debug("Found ports {}".format(ports_))
 
 # set resolution.
 w_, h_ = 1200, 900

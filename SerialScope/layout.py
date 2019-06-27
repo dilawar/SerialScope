@@ -18,7 +18,7 @@ nFrames = 0
 logger = config.logger
 
 def defaultDevice():
-    logger.debug( f"Availabel ports: {config.ports_}" )
+    logger.debug("Availabel ports: {}".format(config.ports_) )
     return config.ports_[0] if config.ports_ else 'demo'
 
 # Two graphs. One for channel 1 and other for channel 2.

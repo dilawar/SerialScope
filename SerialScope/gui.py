@@ -85,7 +85,6 @@ class Channel():
     def draw_value(self):
         t1, y1 = self.curr
         t0, y0 = self.prev
-        #  logger.debug(f"Drawing value {t1} {y1}")
         l = self.graph.DrawLine(
             (t0 * self.xScale, self.offset + (y0 * self.yScale)),
             (t1 * self.xScale, self.offset + (y1 * self.yScale)),
@@ -100,7 +99,7 @@ class Channel():
         self.yScale = 1.0 / max(0.01, v)
 
     def changeOffsetChannel(self, v):
-        logger.info(f"Channel offset to {v} volt.")
+        logger.info("Channel offset to {} volt.".format(v))
         # This is in volt. Change to pixels. Divide by resolution.
         self.offset = v / self.resolution
         #  self.draw_grid()
@@ -230,7 +229,7 @@ class ScopeGUI():
             self.channels["B"].add_value(t1, b1)
 
     def changeResolutionXAxis(self, v):
-        logger.info(f"Updating x-resolution to {v}")
+        logger.info("Updating x-resolution to {}".format(v))
         for c in self.channels:
             self.channels[c].changeResolutionXAxis(v)
 
@@ -251,7 +250,7 @@ class ScopeGUI():
                                  (self.topRight[0], y),
                                  color=self.annotationColor)
         T, V = x / self.gridSize[0], y / self.gridSize[1]
-        annText = f"{T:.1f},{V:.1f}"
+        annText = "{:.1f},{:.1f}".format(T, V)
         t = self.graph.DrawText(annText, (x, y + 8),
                                 color='white',
                                 font='Helvetica 10')

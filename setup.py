@@ -13,7 +13,7 @@ print(f"Version is {__version__}")
 setup(
     name = "SerialScope",
     version = __version__,
-    python_requires = '>=3.6',
+    python_requires = '>=3.5',
     description = "A serial-port based oscilloscope",
     long_description = readme,
     long_description_content_type='text/markdown',
