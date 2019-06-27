@@ -89,7 +89,6 @@ class Channel():
             (t0 * self.xScale, self.offset + (y0 * self.yScale)),
             (t1 * self.xScale, self.offset + (y1 * self.yScale)),
             color=self.color)
-        assert l is not None, "Line not drawn"
         self.lines.append(l)
 
     def changeResolutionXAxis(self, v):
