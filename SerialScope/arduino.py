@@ -65,7 +65,7 @@ class SerialReader():
                 t = time.perf_counter() - startT
                 a, b = interalFun(t)
                 data.append((t, int(a), int(b)))
-                time.sleep( self.internalDelay )
+                C.sleep( self.internalDelay )
             return data
         # Arduino
         t0 = time.perf_counter() - startT
@@ -106,7 +106,7 @@ class SerialReader():
             self.s.close() if self.s else None
             self.port = self.devname
             self.s = serial.Serial(self.port, self.baud)
-            time.sleep(0.5)
+            C.sleep(0.5)
         self.lock.release()
 
     def close(self):
@@ -120,7 +120,7 @@ def test():
     t = threading.Thread( target=s.run,  args=(done,))
     t.daemon = True
     t.start()
-    time.sleep(10)
+    C.sleep(10)
     done = 1
     print("Total {} in 1 seconds.".format(len(C.Q_)))
 

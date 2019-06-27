@@ -7,6 +7,8 @@ __maintainer__ = "Dilawar Singh"
 __email__ = "dilawars@ncbs.res.in"
 __status__ = "Development"
 
+import os
+import time
 import logging
 import collections
 import serial.tools.list_ports
@@ -55,6 +57,20 @@ def getYResolution():
     # volt per division.
     return resolutions_[0] / resolutions_[1]
 
+def accurate_delay(delay):
+    ''' Function to provide accurate time delay in second
+    From https://stackoverflow.com/a/50899124/1805129
+
+    '''
+    _ = time.perf_counter() + delay
+    while time.perf_counter() < _:
+        pass
+
+def sleep(t):
+    if os.name == 'nt':
+        accurate_delay(t)
+    else:
+        time.sleep(t)
 
 # y-axis goes from -Y_ to Y_
 Y = resolutions_[1] + 2.0 / getYResolution()
