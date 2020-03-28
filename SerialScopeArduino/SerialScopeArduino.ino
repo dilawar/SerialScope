@@ -26,6 +26,10 @@ bool reboot_                    = false;
 char subcommand_[NUM_CHANNELS] = { 's', 's' };
 char data_[NUM_CHANNELS][DATA_LENGTH*8];
 double params_[NUM_CHANNELS][DATA_LENGTH];
+int ttime;
+int frequency = 35;
+int upstate = 5;
+int period = 25;
 
 size_t t_ = 0;
 
@@ -176,12 +180,21 @@ void setup()
     // Set analog MODE to input. This is default (I guess).
     pinMode(A0, INPUT);
     pinMode(A1, INPUT);
+    pinMode(4, OUTPUT);
 
-    tone(8, 40);
+    tone(8, frequency);
 }
 
 void loop()
 {
+    ttime = millis()%period;
+    if (ttime<upstate){
+      digitalWrite(4, HIGH);
+    }
+    else{
+      digitalWrite(4, LOW);
+    }
+    
     //is_command_read();
     write_data_line();
     reset_watchdog();
