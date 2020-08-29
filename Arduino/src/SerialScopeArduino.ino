@@ -1,6 +1,6 @@
 /***
  * This file contains arduino code to read data from A1 and A2 pins of Uno
- * board. It is also a signal generator.
+ * board.
  *
  *  See the `git log` for more details.
  */
@@ -17,123 +17,36 @@
 #define PRINTLN(a) ;
 #endif
 
-/*-----------------------------------------------------------------------------
- *  User response
- *-----------------------------------------------------------------------------*/
-int incoming_byte_ = 0;
-bool reboot_ = false;
-char subcommand_[NUM_CHANNELS] = {'s', 's'};
-char data_[NUM_CHANNELS][DATA_LENGTH * 8];
-double params_[NUM_CHANNELS][DATA_LENGTH];
-int ttime;
-int frequency = 35;
-int upstate = 5;
-int PERIOD = 25;
+#define NSAMPLES 100
+char SAMPLES[NSAMPLES];
+int numSamples_ = 0;
+bool readingA0_ = false;
 
-size_t t_ = 0;
-
-char channel(char cmd)
+ISR(ADC_vect)
 {
-    // analogRead is 10 bit. So we scale is to 8 bits before sending it. This is
-    // less accurate but we can send 4 times more data.
-    size_t TIME_PERIOD = 10000;  // In uS
+    byte v = ADCH;
 
-    if (cmd == 's') {
-        size_t dt = micros() - t_;
-        if (dt <= (TIME_PERIOD / 2))
-            return 0;
-        else {
-            if (dt >= TIME_PERIOD)
-                t_ = micros();
-            return 255;
-        }
-    }
-    if (cmd == 'r')
-        return random(0, 255);
+    // if readingA0_ is true, then next read should be from pin A0 else A1.
+    if(readingA0_)
+        ADMUX |= (A1 & 0x07);    // set A1 analog input pin
     else
-        return random(0, 40);
+        ADMUX |= (A0 & 0x07);    // set A0 analog input pin
+
+
+    SAMPLES[numSamples_] = v;
+    numSamples_ += 1;
+    if (numSamples_ == NSAMPLES) {
+        Serial.print(SAMPLES[0], HEX);
+        Serial.print(',');
+        numSamples_ = 0;
+    };
 }
 
-void print_debug_data()
-{
-#ifdef TESTING
-    Serial.println("== DATA ");
-    for (size_t i = 0; i < NUM_CHANNELS; i++) {
-        Serial.println(subcommand_[i]);
-        for (size_t ii = 0; ii < DATA_LENGTH; ii++) {
-            PRINT(params_[i][ii]);
-            PRINT(',');
-        }
-        PRINTLN("");
-    }
-#endif
-}
-
-inline void wait_for_data()
-{
-    while (!Serial.available()) {
-        continue;
-    }
-}
-
-/**
- * @brief  Command send to arduino starts with character 'c'. Immediate after a
- * character code is send which is subcommand. It is again 1 byte long.
- * After which 5 double are sent (8 bytes each, total 40 bytes). They are used
- * as parameters for subcommands.
- * TODO: more information.
- */
-bool is_command_read()
-{
-    if (!Serial.available())
-        return false;
-
-    if ('c' == Serial.read()) {
-        PRINTLN("Got command ");
-        // Command has started.
-        wait_for_data();
-        int whichChannel = Serial.read() % 2;
-        PRINTLN("Channel " + String(whichChannel));
-
-        wait_for_data();
-        subcommand_[whichChannel] = Serial.read();
-        PRINTLN("Subcommand " + String(subcommand_[whichChannel]));
-        PRINTLN(" Waiting for data. " + String(DATA_LENGTH * 8));
-        for (size_t i = 0; i < DATA_LENGTH * 8; i++) {
-            wait_for_data();
-            data_[whichChannel][i] = Serial.read();
-            PRINT(data_[whichChannel][i]);
-        }
-
-        // It is 8 bits.
-        PRINTLN("\tConverting to double");
-        for (size_t i = 0; i < DATA_LENGTH; i++) {
-            memcpy(params_ + whichChannel * DATA_LENGTH + i,
-                   data_ + (whichChannel * DATA_LENGTH * ADC_BITS) +
-                       (i * ADC_BITS),
-                   ADC_BITS);
-        }
-
-        print_debug_data();
-    }
-    return false;
-}
-
-// Two critical functions.
 char intToChar(int val)
 {
     // analogRead is 10 bits. Change it to 8 bits.
     char x = (char)(255.0 * val / 1023.0);
     return x;
-}
-
-void write_data_line()
-{
-    char a = intToChar(analogRead(A0));
-    char b = intToChar(analogRead(A1));
-    Serial.print(a);
-    Serial.print(b);
-    Serial.flush();
 }
 
 void setup()
@@ -142,25 +55,31 @@ void setup()
     // rougly x/10 char per seconds or x/1000 char per 10 ms. We want rougly 100
     // chars per ms i.e. baud rate should be higher than 100,000.
     Serial.begin(115200);
-
-    t_ = millis();
-
-    // Set analog MODE to input. 
+    // Set analog MODE to input.
     pinMode(A0, INPUT);
     pinMode(A1, INPUT);
-    pinMode(4, OUTPUT);
+
+    // Thanks
+    // https://yaab-arduino.blogspot.com/2015/02/fast-sampling-from-analog-input.html
+    ADCSRA = 0;             // clear ADCSRA register
+    ADCSRB = 0;             // clear ADCSRB register
+    ADMUX |= (0 & 0x07);    // set A0 analog input pin
+    ADMUX |= (1 << REFS0);  // set reference voltage
+    ADMUX |= (1 << ADLAR);  // left align ADC value to 8 bits from ADCH register
+
+    // sampling rate is [ADC clock] / [prescaler] / [conversion clock cycles]
+    // for Arduino Uno ADC clock is 16 MHz and a conversion takes 13 clock
+    // cycles
+    // ADCSRA |= (1 << ADPS2) | (1 << ADPS0);    // 32 prescaler for 38.5 KHz
+    ADCSRA |= (1 << ADPS2);  // 16 prescaler for 76.9 KHz
+    // ADCSRA |= (1 << ADPS1) | (1 << ADPS0);    // 8 prescaler for 153.8 KHz
+
+    ADCSRA |= (1 << ADATE);  // enable auto trigger
+    ADCSRA |= (1 << ADIE);   // enable interrupts when measurement complete
+    ADCSRA |= (1 << ADEN);   // enable ADC
+    ADCSRA |= (1 << ADSC);   // start ADC measurements
 }
 
-void loop()
-{
-    ttime = millis() % PERIOD;
-    if (ttime < upstate) {
-        digitalWrite(4, HIGH);
-    }
-    else {
-        digitalWrite(4, LOW);
-    }
-
-    // is_command_read();
-    write_data_line();
+void loop() { 
+    //write_data_line(); 
 }
