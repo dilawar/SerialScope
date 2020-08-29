@@ -82,5 +82,7 @@ void write_data_line( )
 }
 ```
 
-A sketch is available in `SerialScopeArduino/` directory. Open it in your
-arduino IDE and upload to your Arduino board. 
+A sketch is available in `Arduino/src` directory. Open it in your arduino IDE
+and upload to your Arduino board. 
+
+The `Makefile` in `Arudino` folder uses `platformIO` tool.
